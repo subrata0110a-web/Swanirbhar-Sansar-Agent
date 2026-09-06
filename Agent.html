@@ -1,0 +1,3392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>SWANIRBHAR SANSAR · Agent Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --primary-dark:#0B3D2E;
+  --primary:#12704F;
+  --primary-light:#1AA97A;
+  --primary-tint:#E4F5EE;
+  --accent:#D8A13C;
+  --accent-tint:#FBF1DC;
+  --danger:#E14B3C;
+  --danger-tint:#FCE8E5;
+  --warning:#EF9C2E;
+  --warning-tint:#FDF1DE;
+  --info:#2F7CE0;
+  --info-tint:#E7F0FD;
+  --bg:#F4F7F5;
+  --card:#FFFFFF;
+  --text:#12201B;
+  --text-soft:#5F736C;
+  --text-faint:#96A6A0;
+  --border:#E6ECE9;
+  --radius-lg:22px;
+  --radius-md:16px;
+  --radius-sm:11px;
+  --shadow-sm:0 1px 3px rgba(15,41,32,.06);
+  --shadow-md:0 8px 24px rgba(15,41,32,.08);
+  --shadow-lg:0 16px 40px rgba(15,41,32,.14);
+  --nav-h:68px;
+  --font-display:'Poppins',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'Roboto Mono',monospace;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-body);overflow-x:hidden;}
+body{-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4,h5{font-family:var(--font-display);margin:0;color:var(--text);}
+p{margin:0;}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
+input,select{font-family:inherit;}
+a{text-decoration:none;color:inherit;}
+::-webkit-scrollbar{display:none;}
+*{scrollbar-width:none;}
+.hidden{display:none !important;}
+.mono{font-family:var(--font-mono);}
+.amt{font-family:var(--font-mono);font-weight:700;}
+
+/* ============ LAYOUT SHELLS ============ */
+#app{max-width:100vw;min-height:100vh;position:relative;}
+#loginScreen{min-height:100vh;background:linear-gradient(160deg,var(--primary-dark) 0%, var(--primary) 55%, #0E5A40 100%);display:flex;flex-direction:column;justify-content:center;padding:32px 24px;position:relative;overflow:hidden;}
+#loginScreen::before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.06);top:-120px;right:-100px;}
+#loginScreen::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(216,161,60,.14);bottom:-90px;left:-70px;}
+.login-brand{position:relative;z-index:2;display:flex;align-items:center;gap:12px;margin-bottom:44px;}
+.login-brand .mark{width:46px;height:46px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:21.5px;color:var(--primary-dark);box-shadow:var(--shadow-md);font-weight:600;}
+.login-brand h1{color:#fff;font-size:21.5px;letter-spacing:.2px;font-weight:600;}
+.login-brand span{display:block;color:rgba(255,255,255,.7);font-size:13.5px;font-weight:500;}
+.login-card{position:relative;z-index:2;background:rgba(255,255,255,.98);border-radius:var(--radius-lg);padding:28px 22px;box-shadow:var(--shadow-lg);}
+.login-card h2{font-size:23.5px;margin-bottom:4px;font-weight:600;}
+.login-card p.sub{color:var(--text-soft);font-size:15px;margin-bottom:22px;font-weight:600;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:14px;font-weight:600;color:var(--text-soft);margin-bottom:6px;}
+.field .input-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 14px;background:#FBFDFC;}
+.field .input-wrap i{color:var(--text-faint);font-size:16.5px;margin-right:10px;font-weight:600;}
+.field input,.field select{border:none;background:transparent;outline:none;flex:1;padding:13px 0;font-size:16.5px;color:var(--text);font-weight:600;}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--radius-sm);font-weight:600;font-size:16.5px;min-height:50px;transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 10px 22px rgba(18,112,79,.28);}
+.btn-primary:disabled{opacity:.55;}
+.btn-accent{background:var(--accent);color:var(--primary-dark);}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text);}
+.btn-danger-outline{background:var(--danger-tint);color:var(--danger);}
+.btn-full{width:100%;}
+.demo-row{display:flex;gap:10px;margin-top:16px;}
+.demo-chip{flex:1;border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:10px 8px;text-align:center;font-size:13.5px;font-weight:600;color:var(--primary);background:var(--primary-tint);}
+.login-footnote{position:relative;z-index:2;text-align:center;color:rgba(255,255,255,.65);font-size:13px;margin-top:22px;font-weight:600;}
+.login-error{background:var(--danger-tint);color:var(--danger);font-size:14.5px;font-weight:600;padding:10px 12px;border-radius:10px;margin-bottom:14px;display:none;}
+
+/* ============ APP SHELL ============ */
+#appShell{display:flex;flex-direction:column;min-height:100vh;}
+#viewport{flex:1;padding-bottom:calc(var(--nav-h) + 24px + env(safe-area-inset-bottom));min-height:100vh;}
+.view{display:none;animation:fadeSlide .22s ease;}
+.view.active{display:block;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* Top bar (secondary pages) */
+.topbar{position:sticky;top:0;z-index:30;background:rgba(244,247,245,.92);backdrop-filter:blur(10px);display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border);}
+.topbar .icon-btn{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:var(--shadow-sm);flex-shrink:0;}
+.topbar h2{font-size:18.5px;flex:1;font-weight:600;}
+.topbar .icon-btn.ghost{background:transparent;box-shadow:none;}
+
+/* Home header */
+.home-header{padding:22px 18px 14px;display:flex;align-items:center;gap:12px;}
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17.5px;font-family:var(--font-display);flex-shrink:0;box-shadow:var(--shadow-sm);}
+.avatar.sm{width:38px;height:38px;font-size:14.5px;font-weight:600;}
+.avatar.lg{width:76px;height:76px;font-size:25.5px;font-weight:600;}
+.home-header .greet{flex:1;min-width:0;}
+.home-header .greet .hi{font-size:14px;color:var(--text-soft);font-weight:500;}
+.home-header .greet h1{font-size:19.5px;margin-top:1px;font-weight:600;}
+.header-actions{display:flex;gap:10px;}
+.icon-btn{width:42px;height:42px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);position:relative;flex-shrink:0;}
+.badge-dot{position:absolute;top:6px;right:7px;background:var(--danger);color:#fff;font-size:11px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--bg);}
+.checkin-pill{color:var(--danger);}
+.checkin-pill.online{width:auto;padding:0 13px;gap:6px;background:#E8F8EF;color:#0F9D58;font-weight:700;font-size:12.5px;white-space:nowrap;}
+.checkin-pill.online i{color:#0F9D58;font-size:8px;}
+.checkin-scan-tabs{display:flex;gap:8px;margin:14px 0 4px;}
+.checkin-scan-tabs button{flex:1;padding:9px 0;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-weight:600;font-size:13.5px;color:var(--text-soft);}
+.checkin-scan-tabs button.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+#ciReader{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:220px;}
+
+.container{padding:0 18px;}
+
+/* Balance card */
+.balance-card{margin:6px 18px 20px;background:linear-gradient(150deg,var(--primary-dark),var(--primary) 60%, #0F6046);border-radius:var(--radius-lg);padding:24px 22px;color:#fff;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+.balance-card::after{content:"";position:absolute;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%;right:-60px;top:-70px;}
+.balance-card .label{font-size:14px;opacity:.8;font-weight:500;letter-spacing:.2px;}
+.balance-card .big-amt{font-family:var(--font-mono);font-size:35.5px;font-weight:700;margin-top:4px;letter-spacing:-.5px;}
+.balance-card .breakdown-note{font-size:14px;opacity:.85;margin-top:4px;font-weight:600;display:none;}
+.balance-card .breakdown-note.show{display:block;}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:18px;position:relative;z-index:1;}
+.balance-grid .b-item{background:rgba(255,255,255,.1);border-radius:12px;padding:10px 8px;}
+.balance-grid .b-item .t{font-size:12px;opacity:.75;margin-bottom:3px;font-weight:600;}
+.balance-grid .b-item .v{font-family:var(--font-mono);font-size:16px;font-weight:700;}
+.progress-wrap{margin-top:18px;position:relative;z-index:1;}
+.progress-wrap .pw-top{display:flex;justify-content:space-between;font-size:13.5px;opacity:.85;margin-bottom:6px;font-weight:600;}
+.progress-track{height:9px;background:rgba(255,255,255,.18);border-radius:6px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:6px;width:0%;transition:width 1s cubic-bezier(.22,1,.36,1);}
+.pw-breakdown-btn{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12.5px;transition:transform .12s ease, background .12s ease;font-weight:600;}
+.pw-breakdown-btn:active{transform:scale(.9);background:rgba(255,255,255,.28);}
+
+/* Collection breakdown sheet */
+.cb-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.cb-row:last-of-type{border-bottom:none;}
+.cb-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17.5px;flex-shrink:0;font-weight:600;}
+.cb-icon.upi{background:var(--info-tint);color:var(--info);}
+.cb-icon.cash{background:var(--accent-tint);color:var(--accent);}
+.cb-icon.bank{background:var(--primary-tint);color:var(--primary);}
+.cb-info{flex:1;min-width:0;}
+.cb-info .cb-label{font-size:15px;font-weight:600;color:var(--text);}
+.cb-info .cb-count{font-size:13px;color:var(--text-soft);margin-top:1px;font-weight:600;}
+.cb-amt{font-family:var(--font-mono);font-weight:700;font-size:16.5px;color:var(--text);flex-shrink:0;}
+.cb-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:2px;}
+.cb-total-row .cb-total-label{font-size:14.5px;font-weight:600;color:var(--text-soft);}
+.cb-total-row .cb-total-amt{font-family:var(--font-mono);font-weight:800;font-size:20.5px;color:var(--primary-dark);}
+
+/* Section heading */
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;}
+.section-head h3{font-size:17px;font-weight:600;}
+.section-head .view-all{font-size:14px;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:3px;}
+
+/* Quick stats */
+.stat-scroll{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 18px 22px;}
+.stat-card{background:var(--card);border-radius:var(--radius-md);padding:15px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+.stat-card .si{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:15.5px;font-weight:600;}
+.stat-card .t{font-size:13px;color:var(--text-soft);font-weight:600;}
+.stat-card .v{font-family:var(--font-mono);font-size:20.5px;font-weight:700;margin:2px 0 3px;}
+.stat-card .d{font-size:12px;color:var(--text-faint);font-weight:600;}
+.si.blue{background:var(--info-tint);color:var(--info);}
+.si.green{background:var(--primary-tint);color:var(--primary);}
+.si.amber{background:var(--warning-tint);color:var(--warning);}
+.si.red{background:var(--danger-tint);color:var(--danger);}
+
+/* Quick actions */
+.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 18px 24px;}
+.qa-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-sm);text-align:left;min-height:88px;}
+.qa-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+.qa-btn .qi{width:38px;height:38px;border-radius:11px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:16.5px;font-weight:600;}
+.qa-btn.primary .qi{background:rgba(255,255,255,.18);color:#fff;}
+.qa-btn .qt{font-weight:700;font-size:15.5px;}
+.qa-btn .qd{font-size:12.5px;color:var(--text-soft);font-weight:600;}
+.qa-btn.primary .qd{color:rgba(255,255,255,.75);}
+
+/* List cards (collections / due / overdue) */
+.list-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin:0 18px 12px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px;}
+.lc-top{display:flex;align-items:center;gap:11px;}
+.lc-info{flex:1;min-width:0;}
+.lc-info .name{font-weight:700;font-size:16px;}
+.lc-info .grp{font-size:13.5px;color:var(--text-soft);margin-top:1px;font-weight:600;}
+.lc-right{text-align:right;}
+.lc-right .amt{font-size:17px;font-weight:600;}
+.lc-right .time{font-size:12.5px;color:var(--text-faint);margin-top:2px;font-weight:600;}
+.status-pill{font-size:12px;font-weight:700;padding:4px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;letter-spacing:.2px;}
+.status-pill.paid{background:var(--primary-tint);color:var(--primary);}
+.status-pill.due{background:var(--warning-tint);color:var(--warning);}
+.status-pill.overdue{background:var(--danger-tint);color:var(--danger);}
+.status-pill.partial{background:var(--info-tint);color:var(--info);}
+.status-pill.upcoming{background:#EEF1F0;color:var(--text-soft);}
+.lc-actions{display:flex;gap:8px;}
+.lc-actions .btn{flex:1;min-height:40px;font-size:14.5px;padding:0 10px;font-weight:600;}
+.lc-actions .btn i{font-size:14.5px;font-weight:600;}
+.btn-call{background:var(--info-tint);color:var(--info);}
+.btn-wa{background:#DEF7E9;color:#1F9254;}
+.btn-collect{background:var(--primary);color:#fff;}
+
+/* Groups horizontal scroll */
+.group-scroll{display:flex;gap:12px;overflow-x:auto;padding:0 18px 24px;scroll-snap-type:x mandatory;}
+.group-mini{scroll-snap-align:start;flex:0 0 220px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow-sm);}
+.group-mini .gm-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.group-mini .gicon{width:38px;height:38px;border-radius:11px;background:var(--accent-tint);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16.5px;font-weight:600;}
+.group-mini h4{font-size:16px;font-weight:600;}
+.group-mini .gm-sub{font-size:13px;color:var(--text-soft);font-weight:600;}
+.group-mini .gm-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text-soft);margin-bottom:4px;font-weight:600;}
+.group-mini .gm-row b{color:var(--text);font-family:var(--font-mono);}
+.group-mini .progress-track{background:#EEF1F0;height:6px;margin-top:8px;}
+.group-mini .progress-fill{background:var(--primary);}
+.group-mini .gm-pct{text-align:right;font-size:12.5px;font-weight:700;color:var(--primary);margin-top:4px;}
+
+/* Groups page cards */
+.group-full-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin:0 18px 14px;box-shadow:var(--shadow-sm);}
+.gf-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.gf-head .gicon{width:46px;height:46px;border-radius:14px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:19.5px;font-weight:600;}
+.gf-head h3{font-size:17.5px;font-weight:600;}
+.gf-head .gid{font-size:13px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;font-weight:600;}
+.gf-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.gf-stat{background:#F7FAF8;border-radius:11px;padding:10px 12px;}
+.gf-stat .t{font-size:12px;color:var(--text-soft);font-weight:600;}
+.gf-stat .v{font-family:var(--font-mono);font-weight:700;font-size:16px;margin-top:2px;}
+.gf-actions{display:flex;gap:10px;}
+.gf-actions .btn{flex:1;min-height:44px;font-size:15px;font-weight:600;}
+
+/* Member card */
+.member-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:13px;margin:0 18px 10px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:11px;}
+.member-card .mc-info{flex:1;min-width:0;}
+.member-card .mc-info .name{font-weight:700;font-size:15.5px;}
+.member-card .mc-info .sub{font-size:13px;color:var(--text-soft);margin-top:1px;font-weight:600;}
+.member-card .mc-right{text-align:right;flex-shrink:0;}
+.member-card .mc-right .amt{font-size:15.5px;font-weight:600;}
+.member-card .mc-right button{margin-top:6px;}
+.chip-btn{font-size:13.5px;font-weight:700;padding:7px 12px;border-radius:9px;background:var(--primary);color:#fff;min-height:34px;}
+.chip-btn.outline{background:var(--primary-tint);color:var(--primary);}
+
+/* Tabs */
+.tab-scroll{display:flex;gap:8px;overflow-x:auto;padding:14px 18px;}
+.tab-chip{flex-shrink:0;padding:9px 16px;border-radius:20px;font-size:14.5px;font-weight:600;background:#fff;border:1px solid var(--border);color:var(--text-soft);}
+.tab-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+/* Search */
+.search-bar{margin:14px 18px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:0 14px;box-shadow:var(--shadow-sm);}
+.search-bar i{color:var(--text-faint);}
+.search-bar input{border:none;background:transparent;outline:none;flex:1;padding:13px 10px;font-size:16px;font-weight:600;}
+
+/* Detail pages */
+.detail-hero{background:var(--card);margin:0 18px 16px;border-radius:var(--radius-lg);padding:22px 18px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+.detail-hero h2{font-size:19.5px;margin-top:12px;font-weight:600;}
+.detail-hero .sub{font-size:14px;color:var(--text-soft);margin-top:3px;font-weight:600;}
+.detail-hero .tags{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.tag-chip{background:var(--primary-tint);color:var(--primary);font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin:0 18px 16px;padding:18px;box-shadow:var(--shadow-sm);}
+.info-card h4{font-size:15px;color:var(--text-soft);margin-bottom:12px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--border);}
+.info-row:last-child{border-bottom:none;}
+.info-row .k{font-size:14.5px;color:var(--text-soft);font-weight:600;}
+.info-row .v{font-size:15px;font-weight:700;font-family:var(--font-mono);}
+.info-row .v.pos{color:var(--primary);}
+.info-row .v.neg{color:var(--danger);}
+.contact-row{display:flex;gap:10px;padding:0 18px 4px;}
+.contact-row .btn{flex:1;}
+
+/* Collect screen */
+.collect-summary{background:var(--card);margin:14px 18px;border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+.amount-input-wrap{margin:20px 18px;background:var(--card);border-radius:var(--radius-lg);padding:24px 18px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+.amount-input-wrap label{font-size:14px;color:var(--text-soft);font-weight:600;}
+.amount-input-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;}
+.amount-input-row .rs{font-size:31.5px;font-weight:700;color:var(--text-soft);font-family:var(--font-mono);}
+.amount-input-row input{border:none;outline:none;background:transparent;font-family:var(--font-mono);font-size:39.5px;font-weight:700;width:200px;text-align:center;color:var(--text);}
+.outstanding-note{font-size:13.5px;color:var(--text-faint);margin-top:8px;font-weight:600;}
+.quick-amt-row{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+.quick-amt{padding:8px 14px;border-radius:10px;background:var(--primary-tint);color:var(--primary);font-size:14px;font-weight:700;}
+.pm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 18px 20px;}
+.pm-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:16px 8px;text-align:center;box-shadow:var(--shadow-sm);}
+.pm-card i{font-size:21.5px;color:var(--text-soft);margin-bottom:8px;display:block;font-weight:600;}
+.pm-card .pl{font-size:14px;font-weight:700;}
+.pm-card.selected{border-color:var(--primary);background:var(--primary-tint);}
+.pm-card.selected i,.pm-card.selected .pl{color:var(--primary);}
+.fixed-bottom-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);padding:14px 18px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(15,41,32,.06);}
+
+/* Success screen */
+.success-wrap{padding:50px 24px 24px;text-align:center;}
+.success-icon{width:96px;height:96px;border-radius:50%;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:45.5px;margin:0 auto 20px;animation:pop .4s cubic-bezier(.34,1.56,.64,1);font-weight:600;}
+@keyframes pop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.success-wrap h2{font-size:23.5px;margin-bottom:4px;font-weight:600;}
+.success-wrap .samt{font-family:var(--font-mono);font-size:33.5px;font-weight:700;color:var(--primary);margin:14px 0;}
+.success-detail{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;text-align:left;margin:18px 0;box-shadow:var(--shadow-sm);}
+
+/* Receipt */
+.receipt-paper{background:#fff;border:1px dashed var(--border);border-radius:var(--radius-lg);margin:16px 18px;padding:22px 18px;box-shadow:var(--shadow-sm);}
+.receipt-head{text-align:center;padding-bottom:14px;border-bottom:2px dashed var(--border);margin-bottom:14px;}
+.receipt-head .rmark{width:44px;height:44px;border-radius:12px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19.5px;margin:0 auto 8px;font-weight:600;}
+.receipt-head h3{font-size:17.5px;font-weight:600;}
+.receipt-head .sub{font-size:12.5px;color:var(--text-soft);font-weight:600;}
+.receipt-foot{text-align:center;padding-top:14px;border-top:2px dashed var(--border);margin-top:6px;font-size:12.5px;color:var(--text-faint);font-weight:600;}
+
+/* Notifications */
+.notif-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin:0 18px 10px;display:flex;gap:12px;box-shadow:var(--shadow-sm);position:relative;}
+.notif-card.unread{border-left:3px solid var(--primary);}
+.notif-card .ni{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16.5px;font-weight:600;}
+.notif-card .nc-info{flex:1;}
+.notif-card .nc-info h5{font-size:15px;margin-bottom:3px;font-weight:600;}
+.notif-card .nc-info p{font-size:13.5px;color:var(--text-soft);line-height:1.4;font-weight:600;}
+.notif-card .nc-info .time{font-size:12px;color:var(--text-faint);margin-top:5px;font-weight:600;}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);position:absolute;top:14px;right:14px;}
+
+/* Profile */
+.profile-hero{background:linear-gradient(150deg,var(--primary-dark),var(--primary));padding:32px 22px 26px;text-align:center;color:#fff;border-radius:0 0 28px 28px;}
+.profile-hero .avatar.lg{margin:0 auto 12px;background:#fff;color:var(--primary);}
+.profile-hero h2{color:#fff;font-size:20.5px;font-weight:600;}
+.profile-hero .sub{color:rgba(255,255,255,.75);font-size:14px;margin-top:2px;font-weight:600;}
+.profile-hero .status-pill{margin-top:10px;background:rgba(255,255,255,.18);color:#fff;}
+.menu-row{display:flex;align-items:center;gap:14px;padding:15px 18px;background:var(--card);border-bottom:1px solid var(--border);}
+.menu-row:first-child{border-radius:var(--radius-md) var(--radius-md) 0 0;}
+.menu-row:last-child{border-radius:0 0 var(--radius-md) var(--radius-md);border-bottom:none;}
+.menu-row i.mi{width:34px;height:34px;border-radius:10px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:15.5px;font-weight:600;}
+.menu-row span{flex:1;font-size:15.5px;font-weight:600;}
+.menu-block{margin:0 18px 20px;border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+
+/* Bottom nav */
+#bottomNav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -6px 22px rgba(15,41,32,.07);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-faint);font-size:12px;font-weight:600;position:relative;}
+.nav-item i{font-size:19.5px;font-weight:600;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-fab{width:42px;height:42px;border-radius:14px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:-14px;box-shadow:0 8px 18px rgba(18,112,79,.35);}
+.nav-item.active .nav-fab{transform:scale(1.05);}
+
+/* Side menu (mobile) */
+#sideMenuOverlay{position:fixed;inset:0;background:rgba(11,25,20,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s ease;}
+#sideMenuOverlay.open{opacity:1;pointer-events:auto;}
+#sideMenu{position:fixed;top:0;right:0;bottom:0;width:78%;max-width:320px;background:#fff;z-index:91;transform:translateX(100%);transition:transform .28s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;padding:24px 0;box-shadow:-10px 0 30px rgba(0,0,0,.15);}
+#sideMenu.open{transform:translateX(0);}
+.sm-head{display:flex;align-items:center;gap:12px;padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.sm-head h4{font-size:16.5px;font-weight:600;}
+.sm-head .sub{font-size:13px;color:var(--text-soft);font-weight:600;}
+.sm-item{display:flex;align-items:center;gap:14px;padding:14px 20px;font-size:15.5px;font-weight:600;color:var(--text);}
+.sm-item i{width:20px;color:var(--text-soft);font-size:16.5px;font-weight:600;}
+.sm-item.danger{color:var(--danger);margin-top:auto;border-top:1px solid var(--border);padding-top:16px;}
+.sm-item.danger i{color:var(--danger);}
+
+/* Toasts */
+#toastContainer{position:fixed;top:16px;left:0;right:0;z-index:200;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 18px;}
+.toast{background:var(--text);color:#fff;padding:12px 18px;border-radius:12px;font-size:15px;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;animation:toastIn .25s ease;max-width:420px;}
+.toast.error{background:var(--danger);}
+.toast.success{background:var(--primary);}
+@keyframes toastIn{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+
+/* Modal / bottom sheet */
+#modalOverlay{position:fixed;inset:0;background:rgba(11,25,20,.5);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+#modalOverlay.open{opacity:1;pointer-events:auto;}
+.sheet{background:#fff;width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));transform:translateY(30px);transition:transform .25s cubic-bezier(.22,1,.36,1);box-shadow:0 -10px 30px rgba(0,0,0,.18);}
+#modalOverlay.open .sheet{transform:translateY(0);}
+.sheet .sheet-icon{width:54px;height:54px;border-radius:50%;background:var(--danger-tint);color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:23.5px;margin-bottom:14px;font-weight:600;}
+.sheet h3{font-size:18px;margin-bottom:6px;font-weight:600;}
+.sheet p{font-size:15px;color:var(--text-soft);line-height:1.5;margin-bottom:18px;font-weight:600;}
+.sheet .sheet-actions{display:flex;gap:10px;}
+.sheet .sheet-actions .btn{flex:1;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:50px 24px;color:var(--text-faint);}
+.empty-state i{font-size:39.5px;margin-bottom:12px;display:block;color:var(--border);font-weight:600;}
+.empty-state p{font-size:15px;font-weight:600;}
+
+/* Loading */
+#loadingOverlay{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.spinner{width:38px;height:38px;border:4px solid var(--primary-tint);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Desktop side nav */
+#sideNavDesktop{display:none;}
+
+/* ============ RESPONSIVE ============ */
+@media(min-width:768px){
+  .stat-scroll{grid-template-columns:repeat(4,1fr);}
+  .qa-grid{grid-template-columns:repeat(4,1fr);}
+  .gf-stats{grid-template-columns:repeat(3,1fr);}
+  .pm-grid{max-width:420px;margin-left:auto;margin-right:auto;}
+}
+@media(min-width:1024px){
+  body{background:#EEF3F0;}
+  #appShell{flex-direction:row;max-width:1280px;margin:0 auto;}
+  #sideNavDesktop{display:flex;flex-direction:column;width:250px;flex-shrink:0;background:#fff;min-height:100vh;border-right:1px solid var(--border);padding:22px 0;position:sticky;top:0;align-self:flex-start;}
+  #bottomNav{display:none;}
+  #viewport{flex:1;padding-bottom:40px;max-width:920px;}
+  .home-header,.balance-card,.section-head,.stat-scroll,.qa-grid,.group-scroll,.list-card,.group-full-card,.member-card,.info-card,.detail-hero,.collect-summary,.amount-input-wrap,.pm-grid,.notif-card,.menu-block,.contact-row,.tab-scroll,.search-bar,.receipt-paper{margin-left:0;margin-right:0;}
+  .stat-scroll,.qa-grid{padding-left:0;padding-right:24px;}
+  .container,.topbar{padding-left:0;padding-right:24px;}
+  .home-header{padding-left:0;padding-right:24px;}
+  .balance-card{margin:6px 24px 20px 0;}
+  .section-head{padding:4px 24px 12px 0;}
+  .list-card,.group-full-card,.member-card,.info-card,.detail-hero,.collect-summary,.amount-input-wrap,.notif-card,.menu-block,.receipt-paper{margin:0 24px 12px 0;}
+  .topbar{display:none;}
+  .fixed-bottom-bar{position:sticky;border-radius:0 0 var(--radius-lg) var(--radius-lg);}
+  .desk-nav-item{display:flex;align-items:center;gap:14px;padding:13px 24px;font-size:15.5px;font-weight:600;color:var(--text-soft);}
+  .desk-nav-item.active{color:var(--primary);background:var(--primary-tint);border-right:3px solid var(--primary);}
+  .desk-nav-item i{width:20px;font-size:17.5px;font-weight:600;}
+  .desk-brand{display:flex;align-items:center;gap:10px;padding:4px 24px 24px;}
+  .desk-brand .mark{width:38px;height:38px;border-radius:11px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17.5px;font-weight:600;}
+  .desk-brand h4{font-size:16px;font-weight:600;}
+  .desk-brand span{font-size:12px;color:var(--text-soft);font-weight:600;}
+}
+
+/* ── Real-time live indicator (Agent) ── */
+#liveIndicator{
+  position:fixed;bottom:76px;right:12px;z-index:9999;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.93);border:1px solid var(--border,#e2e8e4);
+  border-radius:20px;padding:5px 10px;font-size:13.5px;font-weight:600;
+  color:var(--text-soft,#6b7c74);box-shadow:0 2px 8px rgba(0,0,0,.08);
+  pointer-events:none;opacity:0;transition:opacity .4s;
+}
+#liveIndicator.visible{opacity:1;}
+#liveIndicator.syncing .live-dot{background:#f59e0b;}
+#liveIndicator.error   .live-dot{background:#ef4444;}
+.live-dot{
+  width:8px;height:8px;border-radius:50%;background:#27c473;
+  flex-shrink:0;animation:pulse-live 2s infinite;
+}
+@keyframes pulse-live{0%,100%{opacity:1;}50%{opacity:.35;}}
+@media print{
+  body > *:not(#view-receipt){ display:none !important; }
+  #view-receipt{ display:block !important; position:static !important; }
+  #view-receipt > *:not(#receiptContent){ display:none !important; }
+  .contact-row{ display:none !important; }
+  .receipt-paper{ box-shadow:none !important; border:none !important; margin:0 !important; padding:12px !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="loginScreen">
+    <div class="login-brand">
+      <div class="mark"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+      <div>
+        <h1>SWANIRBHAR SANSAR</h1>
+        <span>Group Microfinance · Agent Panel</span>
+      </div>
+    </div>
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to view your assigned groups and collect EMIs.</p>
+      <div class="login-error" id="loginError"></div>
+      <div class="field">
+        <label>Agent ID</label>
+        <div class="input-wrap"><i class="fa-solid fa-id-badge"></i>
+          <input type="text" id="loginAgentId" placeholder="e.g. AG001" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap"><i class="fa-solid fa-lock"></i>
+          <input type="password" id="loginPassword" placeholder="Enter password">
+        </div>
+      </div>
+      <button id="loginSubmitBtn" class="btn btn-primary btn-full" onclick="handleLoginSubmit()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In</button>
+    </div>
+  </div>
+
+  <!-- ================= APP SHELL ================= -->
+  <div id="appShell" class="hidden">
+
+    <!-- Desktop side nav -->
+    <nav id="sideNavDesktop">
+      <div class="desk-brand">
+        <div class="mark"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div><h4>SWANIRBHAR SANSAR</h4><span>Agent Panel</span></div>
+      </div>
+      <a class="desk-nav-item" data-nav="home" onclick="navigateTo('home')"><i class="fa-solid fa-house"></i> Home</a>
+      <a class="desk-nav-item" data-nav="groups" onclick="navigateTo('groups')"><i class="fa-solid fa-people-group"></i> My Groups</a>
+      <a class="desk-nav-item" data-nav="emi" onclick="navigateTo('emi')"><i class="fa-solid fa-file-invoice-dollar"></i> EMI</a>
+      <a class="desk-nav-item" data-nav="collection" onclick="navigateTo('collection')"><i class="fa-solid fa-wallet"></i> Collection</a>
+      <a class="desk-nav-item" data-nav="profile" onclick="navigateTo('profile')"><i class="fa-solid fa-user"></i> Profile</a>
+      <a class="desk-nav-item" data-nav="search" onclick="navigateTo('search')"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+      <a class="desk-nav-item" data-nav="notifications" onclick="navigateTo('notifications')"><i class="fa-solid fa-bell"></i> Notifications</a>
+      <a class="desk-nav-item danger-desk" onclick="confirmLogout()" style="margin-top:auto;color:var(--danger)"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </nav>
+
+    <div id="viewport">
+
+      <!-- ============ HOME ============ -->
+      <div class="view" id="view-home">
+        <div class="home-header">
+          <div class="avatar" id="homeAvatar">RD</div>
+          <div class="greet">
+            <div class="hi" id="greetText">Good Morning 👋</div>
+            <h1 id="homeAgentName">Agent</h1>
+          </div>
+          <div class="header-actions">
+            <button class="icon-btn checkin-pill" id="checkinBtn" onclick="openCheckinModal()" title="Check-in"><i class="fa-solid fa-qrcode"></i></button>
+            <button class="icon-btn" onclick="navigateTo('notifications')"><i class="fa-solid fa-bell"></i><span class="badge-dot hidden" id="notifDot">0</span></button>
+            <button class="icon-btn" onclick="openSideMenu()"><i class="fa-solid fa-bars"></i></button>
+          </div>
+        </div>
+
+        <!-- Shown only while the agent has NOT checked in for today -->
+        <div id="homeOfflineGate" class="hidden" style="text-align:center;padding:54px 24px;">
+          <div style="width:84px;height:84px;border-radius:50%;background:var(--danger-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <i class="fa-solid fa-qrcode" style="font-size:34px;color:var(--danger);"></i>
+          </div>
+          <h2 style="font-size:21px;margin-bottom:8px;">Please Online Fast</h2>
+          <p style="color:var(--text-soft);font-size:14.5px;max-width:320px;margin:0 auto 24px;">Scan today's check-in QR (or enter the number) shown by your branch manager to start working.</p>
+          <button class="btn btn-primary" style="padding:0 26px;display:inline-flex;" onclick="openCheckinModal()"><i class="fa-solid fa-qrcode"></i> Scan / Enter Code</button>
+        </div>
+
+        <!-- Normal dashboard — hidden while offline -->
+        <div id="homeMainContent">
+        <div class="balance-card">
+          <div class="label">Today's Collection</div>
+          <div class="big-amt" id="homeCollectedBig">₹0</div>
+          <div class="breakdown-note" id="homeCollectedBreakdown"></div>
+          <div class="balance-grid">
+            <div class="b-item"><div class="t">Today's Target</div><div class="v" id="homeTarget">₹0</div></div>
+            <div class="b-item"><div class="t">Collected</div><div class="v" id="homeCollected">₹0</div></div>
+            <div class="b-item"><div class="t">Remaining</div><div class="v" id="homeRemaining">₹0</div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="pw-top"><span id="homePct">0% Collected</span><button class="pw-breakdown-btn" onclick="showCollectionBreakdown()" aria-label="View collection breakdown"><i class="fa-solid fa-chart-line"></i></button></div>
+            <div class="progress-track"><div class="progress-fill" id="homeProgressFill"></div></div>
+          </div>
+        </div>
+
+        <div class="section-head"><h3>Quick Statistics</h3></div>
+        <div class="stat-scroll" id="homeStats"></div>
+
+        <div class="section-head"><h3>Quick Actions</h3></div>
+        <div class="qa-grid">
+          <button class="qa-btn primary" onclick="navigateTo('emi',{tab:'today'})">
+            <div class="qi"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div class="qt">Collect EMI</div><div class="qd">Record a payment now</div>
+          </button>
+          <button class="qa-btn" onclick="navigateTo('due')">
+            <div class="qi"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="qt">Today's Due</div><div class="qd">Pending EMIs today</div>
+          </button>
+          <button class="qa-btn" onclick="navigateTo('groups')">
+            <div class="qi"><i class="fa-solid fa-people-group"></i></div>
+            <div class="qt">My Groups</div><div class="qd">View assigned groups</div>
+          </button>
+          <button class="qa-btn" onclick="navigateTo('overdue')">
+            <div class="qi" style="background:var(--danger-tint);color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="qt">Overdue</div><div class="qd">Follow up on members</div>
+          </button>
+        </div>
+
+        <div class="section-head"><h3>Today's Collection</h3><a class="view-all" onclick="navigateTo('collection')">View All <i class="fa-solid fa-chevron-right"></i></a></div>
+        <div id="homeTodayCollection"></div>
+
+        <div class="section-head"><h3>Today's Due</h3><a class="view-all" onclick="navigateTo('due')">View All <i class="fa-solid fa-chevron-right"></i></a></div>
+        <div id="homeTodayDue"></div>
+
+        <div class="section-head"><h3>Overdue Members</h3><a class="view-all" onclick="navigateTo('overdue')">View All <i class="fa-solid fa-chevron-right"></i></a></div>
+        <div id="homeOverdue"></div>
+
+        <div class="section-head"><h3>My Groups</h3><a class="view-all" onclick="navigateTo('groups')">View All <i class="fa-solid fa-chevron-right"></i></a></div>
+        <div class="group-scroll" id="homeGroups"></div>
+        <div style="height:8px"></div>
+        </div>
+      </div>
+
+      <!-- ============ GROUPS LIST ============ -->
+      <div class="view" id="view-groups">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button><h2 style="flex:1">My Groups</h2><button class="icon-btn ghost" onclick="toggleGroupsSearch()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
+        <div class="search-bar hidden" id="groupsSearchBar"><i class="fa-solid fa-magnifying-glass"></i><input id="groupsSearchInput" placeholder="Search group ID, name, member ID or mobile" oninput="filterGroupsPage(this.value)"></div>
+        <div id="groupsList" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ GROUP DETAIL ============ -->
+      <div class="view" id="view-groupDetail">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('groups')"><i class="fa-solid fa-arrow-left"></i></button><h2 id="gdTitle">Group</h2></div>
+        <div id="groupDetailContent" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ MEMBER DETAIL ============ -->
+      <div class="view" id="view-memberDetail">
+        <div class="topbar"><button class="icon-btn ghost" onclick="goBackFromMember()"><i class="fa-solid fa-arrow-left"></i></button><h2>Member Profile</h2></div>
+        <div id="memberDetailContent" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ EMI PAGE ============ -->
+      <div class="view" id="view-emi">
+        <div class="topbar"><h2 style="flex:1">EMI</h2><button class="icon-btn ghost" onclick="navigateTo('search')"><i class="fa-solid fa-magnifying-glass"></i></button></div>
+        <div class="tab-scroll" id="emiTabs"></div>
+        <div id="emiList"></div>
+      </div>
+
+      <!-- ============ COLLECT SCREEN ============ -->
+      <div class="view" id="view-collect">
+        <div class="topbar"><button class="icon-btn ghost" onclick="goBackFromCollect()"><i class="fa-solid fa-arrow-left"></i></button><h2>Collect EMI</h2></div>
+        <div id="collectContent"></div>
+      </div>
+
+      <!-- ============ SUCCESS SCREEN ============ -->
+      <div class="view" id="view-success">
+        <div id="successContent"></div>
+      </div>
+
+      <!-- ============ RECEIPT ============ -->
+      <div class="view" id="view-receipt">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('home')"><i class="fa-solid fa-xmark"></i></button><h2>Receipt</h2></div>
+        <div id="receiptContent"></div>
+      </div>
+
+      <!-- ============ COLLECTION PAGE ============ -->
+      <div class="view" id="view-collection">
+        <div class="topbar"><h2>Collection</h2></div>
+        <div id="collectionContent" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ TODAY'S DUE — GROUP DRILL-DOWN (from Quick Statistics) ============ -->
+      <div class="view" id="view-todayDueGroups">
+        <div class="topbar"><button class="icon-btn ghost" onclick="todayDueGroupsBack()"><i class="fa-solid fa-arrow-left"></i></button><h2 id="todayDueGroupsTitle">Today's Due</h2></div>
+        <div id="todayDueGroupsList" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ DUE PAGE ============ -->
+      <div class="view" id="view-due">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button><h2>Due EMIs</h2></div>
+        <div class="tab-scroll" id="dueTabs"></div>
+        <div id="dueList"></div>
+      </div>
+
+      <!-- ============ OVERDUE — GROUP DRILL-DOWN (from Quick Statistics) ============ -->
+      <div class="view" id="view-overdueGroups">
+        <div class="topbar"><button class="icon-btn ghost" onclick="overdueGroupsBack()"><i class="fa-solid fa-arrow-left"></i></button><h2 id="overdueGroupsTitle">Overdue</h2></div>
+        <div id="overdueGroupsList" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ OVERDUE PAGE ============ -->
+      <div class="view" id="view-overdue">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button><h2>Overdue Members</h2></div>
+        <div id="overdueList" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ SEARCH ============ -->
+      <div class="view" id="view-search">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button><h2>Search</h2></div>
+        <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" placeholder="Search member, mobile, group, loan or txn ID" oninput="performSearch(this.value)"></div>
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- ============ NOTIFICATIONS ============ -->
+      <div class="view" id="view-notifications">
+        <div class="topbar"><button class="icon-btn ghost" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button><h2 style="flex:1">Notifications</h2><a class="view-all" onclick="markAllRead()">Mark all read</a></div>
+        <div id="notifList" style="padding-top:14px;"></div>
+      </div>
+
+      <!-- ============ PROFILE ============ -->
+      <div class="view" id="view-profile">
+        <div id="profileContent"></div>
+      </div>
+
+    </div>
+
+    <!-- ================= BOTTOM NAV ================= -->
+    <nav id="bottomNav">
+      <a class="nav-item" data-nav="home" onclick="navigateTo('home')"><i class="fa-solid fa-house"></i><span>Home</span></a>
+      <a class="nav-item" data-nav="groups" onclick="navigateTo('groups')"><i class="fa-solid fa-people-group"></i><span>Groups</span></a>
+      <a class="nav-item" data-nav="emi" onclick="navigateTo('emi')"><div class="nav-fab"><i class="fa-solid fa-hand-holding-dollar"></i></div><span style="margin-top:4px">EMI</span></a>
+      <a class="nav-item" data-nav="collection" onclick="navigateTo('collection')"><i class="fa-solid fa-wallet"></i><span>Collection</span></a>
+      <a class="nav-item" data-nav="profile" onclick="navigateTo('profile')"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    </nav>
+  </div>
+
+  <!-- Side menu -->
+  <div id="sideMenuOverlay" onclick="closeSideMenu()"></div>
+  <div id="sideMenu">
+    <div class="sm-head">
+      <div class="avatar sm" id="smAvatar">RD</div>
+      <div><h4 id="smName">Agent</h4><div class="sub" id="smId">AG001</div></div>
+    </div>
+    <a class="sm-item" onclick="closeSideMenu();navigateTo('notifications')"><i class="fa-solid fa-bell"></i> Notifications</a>
+    <a class="sm-item" onclick="closeSideMenu();navigateTo('collection')"><i class="fa-solid fa-chart-simple"></i> Performance</a>
+    <a class="sm-item" onclick="closeSideMenu();showToast('Support: helpdesk@swanirbhar.in · 1800-123-456')"><i class="fa-solid fa-headset"></i> Support</a>
+    <a class="sm-item" onclick="closeSideMenu();navigateTo('profile')"><i class="fa-solid fa-user"></i> My Profile</a>
+    <a class="sm-item" onclick="closeSideMenu();showToast('Settings coming soon')"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a class="sm-item danger" onclick="closeSideMenu();confirmLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toastContainer"></div>
+
+  <!-- Modal / confirm sheet -->
+  <div id="modalOverlay">
+    <div class="sheet" id="modalSheet"></div>
+  </div>
+
+</div>
+
+<!-- ── Real-time live indicator ── -->
+<div id="liveIndicator">
+  <span class="live-dot"></span>
+  <span id="liveText">Live</span>
+</div>
+
+<script>
+/* =========================================================================
+   SAHAYOG COLLECT — AGENT COLLECTION PANEL
+   Talks to the real PHP+MySQL backend under /backend/api/.
+   Interest-free, principal-only microfinance model.
+   ========================================================================= */
+
+/* ---------------------------- CONSTANTS ---------------------------- */
+const API_BASE = 'https://bmchome.in/backend/api';
+
+const SF = {
+  KEYS:{ agentSession:'sf_agent_session', agentToken:'sf_agent_token', agentStateCache:'sf_agent_state_cache' },
+  // সব কিছু localStorage এ রাখো — sessionStorage tab reload বা Android Chrome
+  // এর memory management এ মুছে যায়, যার ফলে agent logout হয়ে যায়।
+  // localStorage browser বন্ধ না করা পর্যন্ত থাকে।
+  read(key){ try{
+    const raw = localStorage.getItem(SF.KEYS[key]); return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; } },
+  write(key, val){ try{
+    localStorage.setItem(SF.KEYS[key], JSON.stringify(val));
+  }catch(e){} },
+  remove(key){ try{
+    sessionStorage.removeItem(SF.KEYS[key]); // পুরানো sessionStorage এও পরিষ্কার রাখো
+    localStorage.removeItem(SF.KEYS[key]);
+  }catch(e){} },
+  iso(d){ const dt = new Date(d); return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); },
+  addDays(base,n){ const d = new Date(base); d.setDate(d.getDate()+n); return d; },
+  todayISO(){ return SF.iso(new Date()); },
+
+  /* ---- derived-field helpers (recomputed fresh on every load from server data) ---- */
+  baseEmiState(e){
+    const amt = e.amount||0, paid = e.paidAmount||0;
+    if(paid >= amt - 0.01) return 'paid';
+    if(paid > 0) return 'partial';
+    return 'unpaid';
+  },
+  latestPaymentFor(e, payments){
+    const matches = payments.filter(p => p.loanId===e.loanId && p.emiNumber===e.emiNumber);
+    if(!matches.length) return null;
+    matches.sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+    return matches[matches.length-1];
+  },
+  enrichEmisForAgent(emis, payments){
+    const t = SF.todayISO();
+    return emis.map(e=>{
+      const base = SF.baseEmiState(e);
+      let status;
+      if(base==='paid') status='paid';
+      else if(base==='partial') status='partial';
+      else if(e.dueDate < t) status='overdue';
+      else if(e.dueDate === t) status='due_today';
+      else status='upcoming';
+      const lp = SF.latestPaymentFor(e, payments);
+      return Object.assign({}, e, {
+        status,
+        paidDate: lp ? lp.date : (e.paidDate||null),
+        paidTime: lp ? (lp.time||e.paidTime||'') : (e.paidTime||null),
+        // True only when a real payment record exists against this EMI.
+        // A loan that gets closed via an advance/final payment also gets its
+        // other still-pending EMIs auto-marked paid for bookkeeping, but no
+        // money was actually collected against those specific EMIs — so they
+        // must not count as "collected today" even though their paidDate
+        // happens to fall on today.
+        hasPayment: !!lp
+      });
+    });
+  },
+  enrichGroupsForAgent(groups, members){
+    return groups.map(g=> Object.assign({}, g, {
+      fullAddress: g.fullAddress || g.area || '',
+      groupCode: g.groupCode || g.id,
+      members: members.filter(m=>m.groupId===g.id).map(m=>m.id)
+    }));
+  },
+  enrichMembersForAgent(members){
+    return members.map(m=> Object.assign({}, m, {
+      memberCode: m.memberCode || m.id,
+      joinDate: m.joinDate || m.joiningDate || '',
+      gender: m.gender || ''
+    }));
+  },
+  enrichLoansForAgent(loans, enrichedEmis, payments){
+    return loans.map(l=>{
+      const sched = enrichedEmis.filter(e=>e.loanId===l.id).sort((a,b)=>a.emiNumber-b.emiNumber);
+      const paidPrincipal = sched.reduce((s,e)=>s+(e.paidAmount||0),0);
+      // Advance payments also count towards repayment
+      const advancePaid = (l.advancePaid != null)
+        ? (l.advancePaid||0)
+        : (payments||[]).filter(p=>p.loanId===l.id && p.type==='advance').reduce((s,p)=>s+p.amount,0);
+      const totalPaidAll = paidPrincipal + advancePaid;
+      // Not clamped to zero — matches the Admin panel's loanOutstanding(), which
+      // is allowed to go negative when advance payments exceed the amount
+      // currently due. Clamping here made a group's/loan's outstanding total
+      // disagree with what Admin shows whenever a member had overpaid via advance.
+      const remainingPrincipal = (l.amount||0) - totalPaidAll;
+      const totalEmi = l.numEmi || sched.length;
+      const paidEmi = sched.filter(e=>e.status==='paid').length;
+      const nextUnpaid = sched.find(e=>e.status!=='paid');
+      // Loan-level "overdue" should also catch an overdue EMI that received a
+      // partial payment (status='partial', not 'overdue') — same rule used for
+      // the Overdue page/tab, so the loan pill doesn't disagree with those lists.
+      const t = SF.todayISO();
+      const hasOverdue = sched.some(e=>e.status!=='paid' && e.dueDate < t);
+      // Effective EMI for the next due slot (may be reduced if advance covers most of it)
+      const stdEmi = l.emiAmount || l.emi_amount || 0;
+      const effectiveNextEmi = l.effectiveNextEmiAmount != null
+        ? l.effectiveNextEmiAmount
+        : (remainingPrincipal > 0 ? Math.min(stdEmi, remainingPrincipal) : 0);
+      return Object.assign({}, l, {
+        loanAmount: l.amount, totalPrincipal: l.amount,
+        paidPrincipal: totalPaidAll, advancePaid,
+        remainingPrincipal,
+        totalEmi, paidEmi, remainingEmi: totalEmi - paidEmi,
+        nextDueDate: nextUnpaid ? nextUnpaid.dueDate : null,
+        disbursedDate: l.startDate,
+        effectiveNextEmi,
+        status: remainingPrincipal<=0.01 ? 'closed' : (hasOverdue ? 'overdue' : 'active')
+      });
+    });
+  },
+  enrichPaymentsForAgent(payments, rawEmis){
+    return payments.map(p=>{
+      let emiId = p.emiId;
+      if(!emiId){
+        const match = rawEmis.find(e=>e.loanId===p.loanId && e.emiNumber===p.emiNumber);
+        emiId = match ? match.id : (p.loanId+'-E'+String(p.emiNumber||0).padStart(2,'0'));
+      }
+      return Object.assign({}, p, { emiId, time: p.time||'', transactionId: p.transactionId||p.id, receiptNo: p.receiptNo||p.id });
+    });
+  }
+};
+
+/** Low-level fetch wrapper: attaches the bearer token, always sends/expects JSON,
+ * and throws a normal Error with the server's message on failure. */
+async function apiFetch(path, options){
+  options = options || {};
+  const headers = Object.assign({'Content-Type':'application/json'}, options.headers||{});
+  const token = SF.read('agentToken');
+  if(token) headers['Authorization'] = 'Bearer ' + token;
+  /* Weak/slow mobile networks would otherwise let a fetch hang indefinitely
+     (or a browser/proxy along the way serve a stale cached copy of a GET),
+     which is what made "live update" feel stuck and made a refresh show
+     old data instead of the latest. cache:'no-store' stops the browser from
+     ever answering from its HTTP cache, and the 12s abort timeout makes a
+     stalled request fail fast so the next poll (every 5s) can retry instead
+     of waiting forever on one bad request. */
+  const controller = new AbortController();
+  const timeoutId = setTimeout(()=> controller.abort(), 12000);
+  let res, data;
+  try{
+    res = await fetch(`${API_BASE}/${path}`, Object.assign({}, options, { headers, cache:'no-store', signal: controller.signal }));
+  }catch(e){
+    throw new Error(e && e.name === 'AbortError' ? 'Network too slow — retrying…' : 'Could not reach the server. Check your internet connection.');
+  }finally{
+    clearTimeout(timeoutId);
+  }
+  try{ data = await res.json(); }catch(e){ data = null; }
+  if(!res.ok || !data || data.success === false){
+    const msg = (data && data.error) || `Server error (${res.status})`;
+    if(res.status === 401 && token && state && state.session && !sessionForceLoggingOut){
+      // Token আর valid নেই — admin password change করেছে বা session expire।
+      // তবে শুধু তখনই logout করো যদি এটা background network call না হয়
+      // (RT বা LT এর periodic ping 401 পেলে logout করা উচিত নয় যদি
+      //  agent সক্রিয়ভাবে কাজ করছে — অন্তত একবার confirm করো)।
+      sessionForceLoggingOut = true;
+      // একটু delay দাও যাতে concurrent request গুলো settle করে
+      setTimeout(() => {
+        // এখনো session আছে কিনা check করো (হয়তো ইতিমধ্যে logout হয়েছে)
+        if(!SF.read('agentToken')) { sessionForceLoggingOut = false; return; }
+        logoutAgent();
+        const errBox = document.getElementById('loginError');
+        if(errBox){ errBox.textContent = 'Your session expired. Please log in again.'; errBox.style.display = 'block'; }
+        sessionForceLoggingOut = false;
+      }, 300);
+    }
+    throw new Error(msg);
+  }
+  return data;
+}
+function apiGet(path){ return apiFetch(path, { method:'GET' }); }
+function apiPost(path, body){ return apiFetch(path, { method:'POST', body: JSON.stringify(body||{}) }); }
+function apiPut(path, body){ return apiFetch(path, { method:'PUT', body: JSON.stringify(body||{}) }); }
+
+/* Double-submit guard: makes sure a repeat tap on a Submit/Collect button
+   while the first request is still in flight (slow network, impatient
+   extra tap) doesn't fire a second identical request — e.g. collecting
+   the same EMI payment twice, or checking in twice for the same visit. */
+const __submitLocks = new Set();
+async function withSubmitGuard(name, fn){
+  if(__submitLocks.has(name)) return;
+  __submitLocks.add(name);
+  try{ return await fn(); }
+  finally{ __submitLocks.delete(name); }
+}
+
+let state = { agents:[], groups:[], members:[], loans:[], emis:[], payments:[], notifications:[], session:null };
+let sessionForceLoggingOut = false; // guards against duplicate forced-logout triggers
+let nav = { current:'home', params:{}, historyStack:['home'] };
+let uiTemp = { collectMemberId:null, collectEmiId:null, selectedMethod:null, emiTab:'today', dueTab:'today', groupBackTo:'groups', memberBackTo:'groups', todayDueGroupId:null, overdueGroupId:null };
+let agentOnline = false; // today's check-in status — gates all work until true
+
+/* ---------------------------- UTILITIES ---------------------------- */
+function money(n){ n = Math.round(Number(n)||0); return '₹' + n.toLocaleString('en-IN'); }
+function initials(name){ return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function todayDate(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function toISODate(d){ const dt = new Date(d); return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+function addDays(d,n){ const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+function addMonths(d,n){ const r = new Date(d); r.setMonth(r.getMonth()+n); return r; }
+function fmtDateShort(iso){ if(!iso) return '-'; const d = new Date(iso+'T00:00:00'); const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yyyy=d.getFullYear(); return dd+'/'+mm+'/'+yyyy; }
+function fmtDateDay(iso){ if(!iso) return '-'; const d = new Date(iso+'T00:00:00'); const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); return dd+'/'+mm; }
+function daysBetween(a,b){ return Math.round((new Date(a)-new Date(b))/86400000); }
+function uid(prefix){ return prefix + Math.random().toString(36).slice(2,7).toUpperCase() + Date.now().toString().slice(-4); }
+function seedRand(seed){ let s = seed; return function(){ s = (s*9301+49297)%233280; return s/233280; }; }
+function esc(str){ return String(str==null?'':str).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* Loads this agent's full working dataset from the server in one call. */
+async function initData(){
+  const data = await apiGet('agent_bootstrap.php');
+  const rawGroups = data.groups || [];
+  const rawMembers = data.members || [];
+  const rawLoans = (data.loans || []).filter(l => l.status==='active' || l.status==='completed');
+  const rawEmis = data.emis || [];
+  const rawPayments = data.payments || [];
+
+  state.agents = [data.agent].filter(Boolean);
+  state.groups = SF.enrichGroupsForAgent(rawGroups, rawMembers);
+  state.members = SF.enrichMembersForAgent(rawMembers);
+  state.emis = SF.enrichEmisForAgent(rawEmis, rawPayments);
+  state.payments = SF.enrichPaymentsForAgent(rawPayments, rawEmis);
+  state.loans = SF.enrichLoansForAgent(rawLoans, state.emis, state.payments);
+  state.notifications = (data.notifications || []).map(n => ({
+    id: String(n.id), agentId: data.agent ? data.agent.id : null,
+    title: n.title, message: n.message, type: n.type, read: !!n.isRead, date: n.createdAt
+  }));
+  state.session = SF.read('agentSession') || null;
+  agentOnline = !!data.isOnline;
+  updateCheckinBadge();
+  cacheAgentState();
+}
+/* Mutations persist directly to the server as they happen (see processPayment,
+   readNotification, markAllRead) — kept as a no-op so any leftover call sites
+   don't break. */
+function persist(key){ /* no-op: server is now the source of truth */ }
+
+/* ── Last-live-data cache ──────────────────────────────────────────────
+   Snapshots `state` (+ online status) to localStorage every time it's
+   refreshed from the server (full load or a background sync merge), so the
+   NEXT refresh/login can paint instantly with the last live data this
+   device ever saw — instead of a blank screen while agent_bootstrap.php is
+   still loading over a slow connection. Always immediately followed by a
+   real fetch in the background, so it's a first paint only, never stale
+   truth left standing. */
+// FIX #33: Strip sensitive document URLs before caching agent state to localStorage.
+// Aadhar/voter card URLs are re-fetched from server on next load.
+const AGENT_STRIP_DOC_FIELDS = ['aadharFront','aadharBack','voterFront','voterBack'];
+function stripAgentSensitiveForCache(st){
+  if(!st) return st;
+  const clone = Object.assign({}, st);
+  if(Array.isArray(clone.members)){
+    clone.members = clone.members.map(m=>{
+      const mc = Object.assign({}, m);
+      AGENT_STRIP_DOC_FIELDS.forEach(f=>{ mc[f]=''; });
+      return mc;
+    });
+  }
+  return clone;
+}
+function cacheAgentState(){
+  if(!state) return;
+  try{ SF.write('agentStateCache', { savedAt: Date.now(), state: stripAgentSensitiveForCache(state), agentOnline: agentOnline }); }catch(e){}
+}
+function readCachedAgentState(){
+  const cached = SF.read('agentStateCache');
+  return (cached && cached.state) ? cached : null;
+}
+
+/* ---------------------------- GETTERS ---------------------------- */
+function currentAgent(){ return state.agents.find(a => a.id === (state.session && state.session.agentId)); }
+function myGroups(){ const a = currentAgent(); return a ? state.groups.filter(g => g.agentId === a.id) : []; }
+function myGroupIds(){ return myGroups().map(g => g.id); }
+function getGroup(id){ return state.groups.find(g => g.id === id); }
+function getMember(id){ return state.members.find(m => m.id === id); }
+function getLoanByMember(memberId){ return state.loans.find(l => l.memberId === memberId); }
+function getLoan(id){ return state.loans.find(l => l.id === id); }
+// An EMI only belongs in Due/Overdue/Pending views while its loan is still
+// active — once the loan is closed (including via an advance payment that
+// covers the remainder), its EMIs shouldn't keep counting there, otherwise
+// the overview totals don't match what's actually collectible.
+function isLoanActive(loanId){
+  const l = getLoan(loanId);
+  // state.loans[].status here is enrichLoansForAgent()'s DERIVED collection
+  // state — 'closed' / 'overdue' / 'active' — not the raw loan lifecycle
+  // status. A loan that has fallen overdue correctly flips to 'overdue' (not
+  // 'active'), so checking only for 'active' was wrongly excluding every
+  // overdue loan's own EMIs from Home/Due/Overdue — exactly the ones meant
+  // to show there. Only 'closed' means the loan is actually done.
+  return !!l && l.status !== 'closed';
+}
+function getEmi(id){ return state.emis.find(e => e.id === id); }
+function emisForLoan(loanId){ return state.emis.filter(e => e.loanId === loanId).sort((a,b)=>a.emiNumber-b.emiNumber); }
+function myMembers(){ const ids = myGroupIds(); return state.members.filter(m => ids.includes(m.groupId)); }
+function myEmis(){ const ids = myGroupIds(); return state.emis.filter(e => ids.includes(e.groupId)); }
+function myPayments(){ const ids = myGroupIds(); return state.payments.filter(p => ids.includes(p.groupId)); }
+
+/* ---------------------------- PERMISSIONS ---------------------------- */
+function checkGroupPermission(groupId){ const g = getGroup(groupId); return !!(g && currentAgent() && g.agentId === currentAgent().id); }
+function checkMemberPermission(memberId){ const m = getMember(memberId); return m ? checkGroupPermission(m.groupId) : false; }
+function checkLoanPermission(loanId){ const l = getLoan(loanId); return l ? checkMemberPermission(l.memberId) : false; }
+
+/* ---------------------------- AUTH ---------------------------- */
+async function handleLoginSubmit(){
+  const id = document.getElementById('loginAgentId').value.trim().toUpperCase();
+  const pw = document.getElementById('loginPassword').value.trim();
+  await loginAgent(id, pw);
+}
+function quickLogin(id){ document.getElementById('loginAgentId').value = id; document.getElementById('loginPassword').value = '1234'; loginAgent(id, '1234'); }
+async function loginAgent(agentId, password){
+  const errBox = document.getElementById('loginError');
+  const btn = document.getElementById('loginSubmitBtn');
+  errBox.style.display = 'none';
+  if(btn) btn.disabled = true;
+  try{
+    const res = await apiPost('auth/agent_login.php', {agentId, password});
+    SF.write('agentToken', res.token);
+    state.session = { agentId: res.agent.id, loginAt: new Date().toISOString() };
+    SF.write('agentSession', state.session);
+    await initData();
+    state.session = SF.read('agentSession');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appShell').classList.remove('hidden');
+    // Seed browser history so the very first back-button press stays on home
+    history.replaceState({ view: 'home', params: {} }, '', '#home');
+    navigateTo('home');
+  }catch(e){
+    errBox.textContent = e.message || 'Invalid Agent ID or Password.';
+    errBox.style.display = 'block';
+  }finally{
+    if(btn) btn.disabled = false;
+  }
+}
+function logoutAgent(){
+  apiPost('auth/logout.php', {}).catch(()=>{});
+  state.session = null;
+  agentOnline = false;
+  SF.remove('agentSession'); SF.remove('agentToken');
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginAgentId').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+async function showChangePasswordModal(){
+  // Build an inline form inside the generic modal body
+  openModal({
+    icon:'fa-key', title:'Change Password',
+    body:`<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+      <input id="cpCurrent" type="password" placeholder="Current password" style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;width:100%;box-sizing:border-box;">
+      <input id="cpNew"     type="password" placeholder="New password (min 4 chars)" style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;width:100%;box-sizing:border-box;">
+      <input id="cpConfirm" type="password" placeholder="Confirm new password" style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;width:100%;box-sizing:border-box;">
+      <div id="cpError" style="color:var(--danger);font-size:13px;display:none;"></div>
+    </div>`,
+    confirmLabel:'Update Password', confirmClass:'btn-primary',
+    onConfirm: async () => {
+      const cur = document.getElementById('cpCurrent').value.trim();
+      const nw  = document.getElementById('cpNew').value.trim();
+      const cf  = document.getElementById('cpConfirm').value.trim();
+      const errEl = document.getElementById('cpError');
+      errEl.style.display='none';
+      if(!cur||!nw||!cf){ errEl.textContent='All fields required.'; errEl.style.display='block'; return; }
+      if(nw.length < 4){ errEl.textContent='New password must be at least 4 characters.'; errEl.style.display='block'; return; }
+      if(nw !== cf){ errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+      return withSubmitGuard('changePassword', async () => {
+      try{
+        await apiPost('auth/change_password.php', { currentPassword: cur, newPassword: nw });
+        closeModal();
+        showToast('Password updated successfully!', 'success');
+      } catch(e){
+        errEl.textContent = e.message || 'Could not update password.';
+        errEl.style.display='block';
+      }
+      });
+    }
+  });
+}
+function confirmLogout(){
+  openModal({
+    icon:'fa-arrow-right-from-bracket', title:'Log out?', body:'You will need your Agent ID and password to sign in again.',
+    confirmLabel:'Log Out', confirmClass:'btn-danger-outline', onConfirm: () => { closeModal(); logoutAgent(); }
+  });
+}
+
+/* ---------------------------- ROUTER ---------------------------- */
+// _navFromPopstate prevents pushState being called when navigateTo is
+// triggered by the browser's own back/forward button (popstate event).
+let _navFromPopstate = false;
+
+function navigateTo(viewName, params){
+  params = params || {};
+  // No work until today's check-in is done — bounce everything back to Home,
+  // where the "Please Online Fast" gate + check-in button live.
+  if(!agentOnline && viewName !== 'home'){ viewName = 'home'; params = {}; }
+  nav.current = viewName; nav.params = params;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + viewName);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item, .desk-nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('[data-nav="'+viewName+'"]').forEach(n => n.classList.add('active'));
+
+  if(viewName === 'home') loadDashboard();
+  else if(viewName === 'groups') loadAssignedGroups();
+  else if(viewName === 'groupDetail') { uiTemp.groupBackTo = 'groups'; loadGroupMembers(params.groupId); }
+  else if(viewName === 'memberDetail') { uiTemp.memberBackTo = params.backTo || 'groupDetail'; loadMemberDetails(params.memberId); }
+  else if(viewName === 'emi') loadEMI(params.tab || uiTemp.emiTab || 'today');
+  else if(viewName === 'collect') openCollectScreen(params.memberId, params.emiId);
+  else if(viewName === 'success') renderSuccessScreen();
+  else if(viewName === 'receipt') generateReceipt(params.paymentId, params.advPaymentId);
+  else if(viewName === 'collection') loadCollectionHistory();
+  else if(viewName === 'due') loadDueList(params.filter || uiTemp.dueTab || 'today');
+  else if(viewName === 'todayDueGroups') openTodayDueGroups();
+  else if(viewName === 'overdueGroups') openOverdueGroups();
+  else if(viewName === 'overdue') loadOverdueList();
+  else if(viewName === 'search') { document.getElementById('searchInput').value=''; document.getElementById('searchResults').innerHTML=''; }
+  else if(viewName === 'notifications') loadNotifications();
+  else if(viewName === 'profile') loadProfile();
+
+  document.getElementById('viewport').scrollTop = 0;
+  window.scrollTo(0,0);
+
+  // Push a browser history entry so the Android/iOS back button triggers
+  // popstate instead of closing the app.
+  if(!_navFromPopstate){
+    history.pushState({ view: viewName, params: params }, '', '#' + viewName);
+  }
+}
+function goBackFromMember(){ navigateTo(uiTemp.memberBackTo, {groupId: uiTemp.lastGroupId}); }
+function goBackFromCollect(){
+  if(uiTemp.collectFromEmi) navigateTo('emi', {tab: uiTemp.emiTab});
+  else navigateTo('memberDetail', {memberId: uiTemp.collectMemberId, backTo: uiTemp.memberBackTo});
+}
+
+// Handle Android/iOS hardware back button and browser back navigation.
+window.addEventListener('popstate', function(e){
+  const viewName = (e.state && e.state.view) ? e.state.view : 'home';
+  const params   = (e.state && e.state.params) ? e.state.params : {};
+  _navFromPopstate = true;
+  try { navigateTo(viewName, params); }
+  finally { _navFromPopstate = false; }
+});
+
+/* ---------------------------- HOME DASHBOARD ---------------------------- */
+function loadDashboard(){
+  const agent = currentAgent(); if(!agent) return;
+  const homeAvatarEl = document.getElementById('homeAvatar');
+  if(agent.photo){ homeAvatarEl.style.cssText += 'overflow:hidden;padding:0;'; homeAvatarEl.innerHTML = `<img src="${agent.photo}" style="width:100%;height:100%;object-fit:cover;">`; }
+  else homeAvatarEl.textContent = initials(agent.name);
+  document.getElementById('homeAgentName').textContent = agent.name;
+  const hr = new Date().getHours();
+  document.getElementById('greetText').textContent = (hr < 12 ? 'Good Morning 👋' : hr < 17 ? 'Good Afternoon 👋' : 'Good Evening 👋');
+
+  const gate = document.getElementById('homeOfflineGate');
+  const main = document.getElementById('homeMainContent');
+  if(!agentOnline){
+    if(gate) gate.classList.remove('hidden');
+    if(main) main.classList.add('hidden');
+    return; // no work/data rendering while offline
+  }
+  if(gate) gate.classList.add('hidden');
+  if(main) main.classList.remove('hidden');
+
+  const todayISO = toISODate(todayDate());
+  const emisMine = myEmis();
+  const paymentsToday = myPayments().filter(p => p.date === todayISO);
+  // Match the Admin panel's definition exactly: "today's due" / "overdue" is based
+  // on the EMI's due date + whether it's fully paid yet — not the coarse status
+  // label alone, since a partially-paid due-today EMI was being missed before
+  // (its status is 'partial', not 'due_today') and undercounting vs Admin.
+  const dueTodayEmis = emisMine.filter(e => e.dueDate === todayISO && e.status !== 'paid' && isLoanActive(e.loanId));
+  const overdueEmis = emisMine.filter(e => e.dueDate < todayISO && e.status !== 'paid' && isLoanActive(e.loanId));
+
+  const emiCollectedToday = paymentsToday.filter(p=>p.type!=='advance').reduce((s,p)=>s+p.amount,0);
+  const advanceCollectedToday = paymentsToday.filter(p=>p.type==='advance').reduce((s,p)=>s+p.amount,0);
+  const collectedToday = emiCollectedToday + advanceCollectedToday;
+  const outstandingDueToday = dueTodayEmis.reduce((s,e)=>s+(e.amount-e.paidAmount),0);
+  const overdueTotal = overdueEmis.reduce((s,e)=>s+(e.amount-e.paidAmount),0);
+  // "Today's Due" now shows the same figure as the Admin panel's Today's Due card
+  // (outstanding amount still to be collected against today's due EMIs), instead
+  // of the old formula that added in unrelated collections (advance/overdue
+  // payments made today) and inflated the number above what Admin showed.
+  const due = outstandingDueToday;
+  const pct = due > 0 ? Math.min(100, Math.round((collectedToday/due)*100)) : (collectedToday>0 ? 100 : 0);
+
+  document.getElementById('homeCollectedBig').textContent = money(collectedToday);
+  document.getElementById('homeTarget').textContent = money(due);
+  document.getElementById('homeCollected').textContent = money(collectedToday);
+  document.getElementById('homeRemaining').textContent = money(outstandingDueToday);
+  document.getElementById('homePct').textContent = pct + '% Collected';
+  setTimeout(()=>{ document.getElementById('homeProgressFill').style.width = Math.min(pct,100) + '%'; }, 60);
+
+  const breakdownEl = document.getElementById('homeCollectedBreakdown');
+  if(breakdownEl){
+    if(advanceCollectedToday > 0){
+      breakdownEl.textContent = `EMI ${money(emiCollectedToday)} + Advance ${money(advanceCollectedToday)}`;
+      breakdownEl.classList.add('show');
+    } else {
+      breakdownEl.textContent = '';
+      breakdownEl.classList.remove('show');
+    }
+  }
+
+  const unread = state.notifications.filter(n => n.agentId === agent.id && !n.read).length;
+  const notifDot = document.getElementById('notifDot');
+  if(unread > 0){ notifDot.textContent = unread; notifDot.classList.remove('hidden'); } else { notifDot.classList.add('hidden'); }
+
+  document.getElementById('homeStats').innerHTML = `
+    <div class="stat-card" style="cursor:pointer;" onclick="openTodayDueGroupsFresh()"><div class="si blue"><i class="fa-solid fa-calendar-check"></i></div><div class="t">Today's Due</div><div class="v">${money(due)}</div><div class="d">${dueTodayEmis.length} members</div></div>
+    <div class="stat-card"><div class="si green"><i class="fa-solid fa-circle-check"></i></div><div class="t">Collected</div><div class="v">${money(collectedToday)}</div><div class="d">${paymentsToday.length} payments</div></div>
+    <div class="stat-card"><div class="si amber"><i class="fa-solid fa-hourglass-half"></i></div><div class="t">Pending</div><div class="v">${money(outstandingDueToday)}</div><div class="d">${dueTodayEmis.length} members</div></div>
+    <div class="stat-card" style="cursor:pointer;" onclick="openOverdueGroupsFresh()"><div class="si red"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="t">Overdue</div><div class="v">${money(overdueTotal)}</div><div class="d">${overdueEmis.length} members</div></div>
+  `;
+
+  // Today's collection (recent)
+  const recentPayments = paymentsToday.slice().sort((a,b)=> (b.time>a.time?1:-1)).slice(0,4);
+  document.getElementById('homeTodayCollection').innerHTML = recentPayments.length ? recentPayments.map(p => collectionCardHTML(p)).join('') : emptyState('fa-inbox','No collections recorded yet today');
+
+  // Today's due (top 3)
+  document.getElementById('homeTodayDue').innerHTML = dueTodayEmis.length ? dueTodayEmis.slice(0,3).map(e => dueCardHTML(e)).join('') : emptyState('fa-thumbs-up','No dues remaining for today');
+
+  // Overdue (top 3)
+  document.getElementById('homeOverdue').innerHTML = overdueEmis.length ? overdueEmis.slice(0,3).map(e => overdueCardHTML(e)).join('') : emptyState('fa-thumbs-up','No overdue members');
+
+  // Groups
+  document.getElementById('homeGroups').innerHTML = myGroups().map(g => groupMiniCardHTML(g)).join('');
+}
+
+/* ---------------------------- CARD RENDERERS ---------------------------- */
+function collectionCardHTML(p){
+  const m = getMember(p.memberId); const g = getGroup(p.groupId);
+  const isAdvance = p.type === 'advance';
+  // Check paired advance (advance id = emi id + 'A')
+  const paired = isAdvance ? null
+    : state.payments.find(x => x.loanId === p.loanId && x.type === 'advance'
+        && x.memberId === p.memberId && x.date === p.date
+        && x.id === p.id + 'A');
+  // Hide standalone advance rows that are already paired with an EMI card
+  if(isAdvance){
+    const hasEmiPair = state.payments.find(x => x.loanId === p.loanId && x.type !== 'advance'
+      && x.memberId === p.memberId && x.date === p.date && p.id === x.id + 'A');
+    if(hasEmiPair) return '';
+  }
+  const totalShown = p.amount + (paired ? paired.amount : 0);
+  const typeTag = isAdvance
+    ? '<span style="font-size:10px;background:var(--primary-tint);color:var(--primary);border-radius:3px;padding:0 5px;margin-left:4px;">Advance</span>'
+    : paired
+      ? '<span style="font-size:10px;background:#f0fdf4;color:#16a34a;border-radius:3px;padding:0 5px;margin-left:4px;">EMI + Advance</span>'
+      : '';
+  const receiptParams = paired
+    ? JSON.stringify({paymentId: p.id, advPaymentId: paired.id}).replace(/"/g, '&quot;')
+    : JSON.stringify({paymentId: p.id}).replace(/"/g, '&quot;');
+  return `<div class="list-card">
+    <div class="lc-top">
+      <div class="avatar sm" style="background:var(--primary-tint);color:var(--primary)">${initials(m?m.name:'?')}</div>
+      <div class="lc-info">
+        <div class="name">${esc(m?m.name:'Unknown')}${typeTag}</div>
+        <div class="grp">${esc(g?g.name:'')}</div>
+      </div>
+      <div class="lc-right">
+        <div class="amt amt">${money(totalShown)}</div>
+        ${paired ? `<div style="font-size:10px;color:var(--text-faint);">EMI ${money(p.amount)} + Adv ${money(paired.amount)}</div>` : ''}
+        <div class="time">${p.time}</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span class="status-pill paid"><i class="fa-solid fa-check"></i> Paid</span>
+      <button class="chip-btn outline" style="font-size:11px;padding:2px 10px;" onclick="navigateTo('receipt',${receiptParams})"><i class="fa-solid fa-receipt"></i> Receipt</button>
+    </div>
+  </div>`;
+}
+/* ---------------------------- TODAY'S DUE — GROUP DRILL-DOWN ----------------------------
+   Entry point: the "Today's Due" card in Quick Statistics on Home.
+   Level 1: which of the agent's groups have EMIs due today, and how much.
+   Level 2 (tap a group): which members in that group are due today — each
+   row reuses dueCardHTML below (same Collect button, same collection flow
+   used everywhere else in the app), so nothing about how a payment is taken
+   changes here. */
+function openTodayDueGroupsFresh(){
+  uiTemp.todayDueGroupId = null;
+  navigateTo('todayDueGroups');
+}
+function openTodayDueGroups(){
+  // Just (re)render at whatever level uiTemp.todayDueGroupId currently points
+  // to — reset happens only in openTodayDueGroupsFresh() above, so returning
+  // here via goBackFromMember() lands back on the same group's member list
+  // instead of jumping back out to the group list.
+  renderTodayDueGroups();
+}
+function pickTodayDueGroup(groupId){
+  uiTemp.todayDueGroupId = groupId;
+  renderTodayDueGroups();
+}
+function todayDueGroupsBack(){
+  if(uiTemp.todayDueGroupId){ uiTemp.todayDueGroupId = null; renderTodayDueGroups(); }
+  else navigateTo('home');
+}
+function renderTodayDueGroups(){
+  const titleEl = document.getElementById('todayDueGroupsTitle');
+  const listEl = document.getElementById('todayDueGroupsList');
+  if(!titleEl || !listEl) return;
+  const todayISO = toISODate(todayDate());
+
+  if(!uiTemp.todayDueGroupId){
+    /* Level 1: this agent's groups that have at least one EMI due today */
+    titleEl.textContent = "Today's Due";
+    const groups = myGroups();
+    const rows = groups.map(g=>{
+      const emis = state.emis.filter(e => e.groupId===g.id && e.dueDate===todayISO && e.status!=='paid' && isLoanActive(e.loanId));
+      if(!emis.length) return null;
+      const amt = emis.reduce((s,e)=>s+(e.amount-e.paidAmount),0);
+      return `<div class="list-card" style="cursor:pointer;" onclick="pickTodayDueGroup('${g.id}')">
+        <div class="lc-top">
+          <div class="avatar sm"><i class="fa-solid fa-people-group"></i></div>
+          <div class="lc-info"><div class="name">${esc(g.name)}</div><div class="grp">${emis.length} member(s) due today</div></div>
+          <div class="lc-right"><div class="amt amt">${money(amt)}</div></div>
+        </div>
+      </div>`;
+    }).filter(Boolean);
+    listEl.innerHTML = rows.length ? rows.join('') : emptyState('fa-thumbs-up','No dues remaining for today');
+    return;
+  }
+
+  /* Level 2: members of the selected group who are due today — reuses the
+     existing dueCardHTML card, so the Collect button behaves exactly as it
+     does everywhere else (navigateTo('collect', {memberId, emiId})). */
+  const g = getGroup(uiTemp.todayDueGroupId);
+  titleEl.textContent = g ? g.name : "Today's Due";
+  const emis = state.emis.filter(e => e.groupId===uiTemp.todayDueGroupId && e.dueDate===todayISO && e.status!=='paid' && isLoanActive(e.loanId));
+  listEl.innerHTML = emis.length ? emis.map(e => dueCardHTML(e)).join('') : emptyState('fa-thumbs-up','No dues remaining for today in this group');
+}
+
+/* ---------------------------- OVERDUE — GROUP DRILL-DOWN ----------------------------
+   Same pattern as the Today's Due drill-down above, for the "Overdue" card
+   in Quick Statistics on Home.
+   Level 1: which of the agent's groups have overdue EMIs, and how much.
+   Level 2 (tap a group): which members in that group are overdue — each row
+   reuses overdueCardHTML below (same Collect / Call / WhatsApp buttons), so
+   nothing about how a payment is taken or a member is contacted changes. */
+function openOverdueGroupsFresh(){
+  uiTemp.overdueGroupId = null;
+  navigateTo('overdueGroups');
+}
+function openOverdueGroups(){
+  // (Re)render at whatever level uiTemp.overdueGroupId currently points to —
+  // reset happens only in openOverdueGroupsFresh() above.
+  renderOverdueGroups();
+}
+function pickOverdueGroup(groupId){
+  uiTemp.overdueGroupId = groupId;
+  renderOverdueGroups();
+}
+function overdueGroupsBack(){
+  if(uiTemp.overdueGroupId){ uiTemp.overdueGroupId = null; renderOverdueGroups(); }
+  else navigateTo('home');
+}
+function renderOverdueGroups(){
+  const titleEl = document.getElementById('overdueGroupsTitle');
+  const listEl = document.getElementById('overdueGroupsList');
+  if(!titleEl || !listEl) return;
+  const todayISO = toISODate(todayDate());
+
+  if(!uiTemp.overdueGroupId){
+    /* Level 1: this agent's groups that have at least one overdue EMI */
+    titleEl.textContent = "Overdue";
+    const groups = myGroups();
+    const rows = groups.map(g=>{
+      const emis = state.emis.filter(e => e.groupId===g.id && e.dueDate<todayISO && e.status!=='paid' && isLoanActive(e.loanId));
+      if(!emis.length) return null;
+      const amt = emis.reduce((s,e)=>s+(e.amount-e.paidAmount),0);
+      const memberCount = new Set(emis.map(e=>e.memberId)).size;
+      return `<div class="list-card" style="cursor:pointer;" onclick="pickOverdueGroup('${g.id}')">
+        <div class="lc-top">
+          <div class="avatar sm" style="background:var(--danger-tint);color:var(--danger)"><i class="fa-solid fa-people-group"></i></div>
+          <div class="lc-info"><div class="name">${esc(g.name)}</div><div class="grp">${memberCount} member(s) overdue</div></div>
+          <div class="lc-right"><div class="amt amt" style="color:var(--danger)">${money(amt)}</div></div>
+        </div>
+      </div>`;
+    }).filter(Boolean);
+    listEl.innerHTML = rows.length ? rows.join('') : emptyState('fa-thumbs-up','No overdue members. Great work!');
+    return;
+  }
+
+  /* Level 2: members of the selected group who are overdue — reuses the
+     existing overdueCardHTML card (Collect / Call / WhatsApp buttons). */
+  const g = getGroup(uiTemp.overdueGroupId);
+  titleEl.textContent = g ? g.name : "Overdue";
+  const emis = state.emis.filter(e => e.groupId===uiTemp.overdueGroupId && e.dueDate<todayISO && e.status!=='paid' && isLoanActive(e.loanId)).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  listEl.innerHTML = emis.length ? emis.map(e => overdueCardHTML(e)).join('') : emptyState('fa-thumbs-up','No overdue members in this group');
+}
+
+function dueCardHTML(e){
+  const m = getMember(e.memberId); const g = getGroup(e.groupId);
+  const outstanding = e.amount - e.paidAmount;
+  // backTo adapts to where this card is being shown from: the normal flat
+  // "Due EMIs" tab list keeps its existing behaviour (backTo:'due'); when
+  // this same card is reused inside the new Today's Due group drill-down,
+  // View correctly returns there instead.
+  const backView = (typeof nav!=='undefined' && nav.current==='todayDueGroups') ? 'todayDueGroups' : 'due';
+  return `<div class="list-card">
+    <div class="lc-top">
+      <div class="avatar sm">${initials(m?m.name:'?')}</div>
+      <div class="lc-info"><div class="name">${esc(m?m.name:'Unknown')}</div><div class="grp">${esc(g?g.name:'')} · EMI #${e.emiNumber}</div></div>
+      <div class="lc-right"><div class="amt amt">${money(outstanding)}</div><div class="time">Due ${fmtDateDay(e.dueDate)}</div></div>
+    </div>
+    <div class="lc-actions">
+      <button class="btn btn-collect" onclick="navigateTo('collect',{memberId:'${e.memberId}', emiId:'${e.id}'})"><i class="fa-solid fa-hand-holding-dollar"></i> Collect</button>
+      <button class="btn btn-outline" onclick="navigateTo('memberDetail',{memberId:'${e.memberId}', backTo:'${backView}'})"><i class="fa-solid fa-eye"></i> View</button>
+    </div>
+  </div>`;
+}
+function overdueCardHTML(e){
+  const m = getMember(e.memberId); const g = getGroup(e.groupId);
+  const outstanding = e.amount - e.paidAmount;
+  const days = daysBetween(todayDate(), e.dueDate) * -1;
+  return `<div class="list-card">
+    <div class="lc-top">
+      <div class="avatar sm" style="background:var(--danger-tint);color:var(--danger)">${initials(m?m.name:'?')}</div>
+      <div class="lc-info"><div class="name">${esc(m?m.name:'Unknown')}</div><div class="grp">${esc(g?g.name:'')}</div></div>
+      <div class="lc-right"><div class="amt amt" style="color:var(--danger)">${money(outstanding)}</div><span class="status-pill overdue">${days}d overdue</span></div>
+    </div>
+    <div class="lc-actions">
+      <button class="btn btn-collect" onclick="navigateTo('collect',{memberId:'${e.memberId}', emiId:'${e.id}'})"><i class="fa-solid fa-hand-holding-dollar"></i> Collect</button>
+      <button class="btn btn-call" onclick="callMember('${m?m.mobile:''}')"><i class="fa-solid fa-phone"></i></button>
+      <button class="btn btn-wa" onclick="whatsappMember('${m?m.mobile:''}','${m?esc(m.name).replace(/'/g,''):''}')"><i class="fa-brands fa-whatsapp"></i></button>
+    </div>
+  </div>`;
+}
+function groupMiniCardHTML(g){
+  const stats = groupStats(g.id);
+  return `<div class="group-mini" onclick="navigateTo('groupDetail',{groupId:'${g.id}'})">
+    <div class="gm-top"><div class="gicon"><i class="fa-solid fa-people-group"></i></div><div><h4>${esc(g.name)}</h4><div class="gm-sub">${stats.memberCount} Members</div></div></div>
+    <div class="gm-row"><span>Today's Due</span><b>${money(stats.dueToday)}</b></div>
+    <div class="gm-row"><span>Collected</span><b>${money(stats.collectedToday)}</b></div>
+    <div class="progress-track"><div class="progress-fill" style="width:${stats.pct}%"></div></div>
+    <div class="gm-pct">${stats.pct}%</div>
+  </div>`;
+}
+function emptyState(icon,text){ return `<div class="empty-state"><i class="fa-solid ${icon}"></i><p>${esc(text)}</p></div>`; }
+
+/* ---------------------------- GROUP STATS ---------------------------- */
+function groupStats(groupId){
+  const memberIds = state.members.filter(m => m.groupId === groupId).map(m => m.id);
+  const emis = state.emis.filter(e => e.groupId === groupId);
+  const todayISO = toISODate(todayDate());
+  // Same due-date + not-fully-paid definition as the Admin panel and the home
+  // dashboard, so a group's "Today's Due" always matches across both panels.
+  const dueTodayEmis = emis.filter(e => e.dueDate === todayISO && e.status !== 'paid' && isLoanActive(e.loanId));
+  const overdueEmis = emis.filter(e => e.dueDate < todayISO && e.status !== 'paid' && isLoanActive(e.loanId));
+  const paymentsToday = state.payments.filter(p => p.groupId === groupId && p.date === todayISO);
+  const collectedToday = paymentsToday.reduce((s,p)=>s+p.amount,0);
+  const outstandingToday = dueTodayEmis.reduce((s,e)=>s+(e.amount-e.paidAmount),0);
+  const dueToday = outstandingToday;
+  const overdueTotal = overdueEmis.reduce((s,e)=>s+(e.amount-e.paidAmount),0);
+  const loans = state.loans.filter(l => l.groupId === groupId);
+  const outstandingTotal = loans.reduce((s,l)=>s+l.remainingPrincipal,0);
+  const pct = dueToday > 0 ? Math.min(100, Math.round((collectedToday/dueToday)*100)) : 100;
+  return { memberCount: memberIds.length, dueToday, collectedToday, outstandingToday, overdueTotal, outstandingTotal, pct, overdueCount: overdueEmis.length };
+}
+
+/* ---------------------------- GROUPS PAGES ---------------------------- */
+function loadAssignedGroups(){
+  const bar = document.getElementById('groupsSearchBar');
+  if(bar) bar.classList.add('hidden');
+  const input = document.getElementById('groupsSearchInput');
+  if(input) input.value = '';
+  const groups = myGroups();
+  document.getElementById('groupsList').innerHTML = groups.length ? groups.map(g => groupFullCardHTML(g)).join('') : emptyState('fa-people-group','No groups assigned yet');
+}
+function groupFullCardHTML(g){
+  const s = groupStats(g.id);
+  return `<div class="group-full-card">
+      <div class="gf-head"><div class="gicon"><i class="fa-solid fa-people-group"></i></div>
+        <div><h3>${esc(g.name)}</h3><div class="gid">${esc(g.groupCode)} · ${s.memberCount} Members</div></div>
+      </div>
+      <div class="gf-stats">
+        <div class="gf-stat"><div class="t">Today's Due</div><div class="v">${money(s.dueToday)}</div></div>
+        <div class="gf-stat"><div class="t">Collected</div><div class="v" style="color:var(--primary)">${money(s.collectedToday)}</div></div>
+        <div class="gf-stat"><div class="t">Outstanding</div><div class="v">${money(s.outstandingTotal)}</div></div>
+        <div class="gf-stat"><div class="t">Overdue</div><div class="v" style="color:var(--danger)">${money(s.overdueTotal)}</div></div>
+      </div>
+      <div class="progress-track" style="background:#EEF1F0;margin-bottom:14px;"><div class="progress-fill" style="background:var(--primary);width:${s.pct}%"></div></div>
+      <div class="gf-actions">
+        <button class="btn btn-outline" onclick="navigateTo('groupDetail',{groupId:'${g.id}'})"><i class="fa-solid fa-eye"></i> View</button>
+        <button class="btn btn-primary" onclick="navigateTo('groupDetail',{groupId:'${g.id}'})"><i class="fa-solid fa-hand-holding-dollar"></i> Collect</button>
+      </div>
+    </div>`;
+}
+function toggleGroupsSearch(){
+  const bar = document.getElementById('groupsSearchBar');
+  bar.classList.toggle('hidden');
+  if(!bar.classList.contains('hidden')){
+    document.getElementById('groupsSearchInput').focus();
+  } else {
+    document.getElementById('groupsSearchInput').value = '';
+    loadAssignedGroups();
+  }
+}
+function filterGroupsPage(q){
+  const box = document.getElementById('groupsList');
+  q = q.trim().toLowerCase();
+  if(!q){ 
+    const groups = myGroups();
+    box.innerHTML = groups.length ? groups.map(g => groupFullCardHTML(g)).join('') : emptyState('fa-people-group','No groups assigned yet');
+    return;
+  }
+  const matchedGroups = myGroups().filter(g => g.id.toLowerCase().includes(q) || g.groupCode.toLowerCase().includes(q) || g.name.toLowerCase().includes(q));
+  const matchedMembers = myMembers().filter(m => m.id.toLowerCase().includes(q) || m.memberCode.toLowerCase().includes(q) || m.mobile.toLowerCase().includes(q));
+
+  let html = '';
+  if(matchedGroups.length) html += `<div class="section-head" style="padding-top:0;"><h3>Groups</h3></div>` + matchedGroups.map(g => groupFullCardHTML(g)).join('');
+  if(matchedMembers.length) html += `<div class="section-head"><h3>Members</h3></div>` + matchedMembers.map(m => memberCardHTML(m, 'groups')).join('');
+  if(!html) html = emptyState('fa-magnifying-glass','No matching group or member found');
+  box.innerHTML = html;
+}
+
+function loadGroupMembers(groupId){
+  if(!checkGroupPermission(groupId)){ showToast('You are not authorized to view this group','error'); navigateTo('groups'); return; }
+  uiTemp.lastGroupId = groupId;
+  const g = getGroup(groupId); const s = groupStats(groupId);
+  document.getElementById('gdTitle').textContent = g.name;
+  const members = state.members.filter(m => m.groupId === groupId);
+  document.getElementById('groupDetailContent').innerHTML = `
+    <div class="detail-hero">
+      <div class="avatar lg" style="margin:0 auto;background:var(--primary-tint);color:var(--primary)"><i class="fa-solid fa-people-group"></i></div>
+      <h2>${esc(g.name)}</h2>
+      <div class="sub">${esc(g.groupCode)} · ${esc(g.area)}</div>
+      <div class="sub" style="margin-top:2px;"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>${esc(g.fullAddress || g.area)}</div>
+      <div class="tags"><span class="tag-chip">${s.memberCount} Members</span></div>
+    </div>
+    <div class="info-card">
+      <h4>Collection Summary</h4>
+      <div class="info-row"><span class="k">Today's Due</span><span class="v">${money(s.dueToday)}</span></div>
+      <div class="info-row"><span class="k">Collected</span><span class="v pos">${money(s.collectedToday)}</span></div>
+      <div class="info-row"><span class="k">Pending Today</span><span class="v">${money(s.outstandingToday)}</span></div>
+      <div class="info-row"><span class="k">Outstanding Principal</span><span class="v">${money(s.outstandingTotal)}</span></div>
+      <div class="info-row"><span class="k">Overdue</span><span class="v neg">${money(s.overdueTotal)}</span></div>
+    </div>
+    <div class="section-head"><h3>Members</h3></div>
+    ${members.map(m => memberCardHTML(m)).join('')}
+  `;
+}
+function memberCardHTML(m, backTo){
+  backTo = backTo || 'groupDetail';
+  const loan = getLoanByMember(m.id);
+  const outstanding = loan ? Math.max(0, loan.remainingPrincipal) : 0;
+  const nextEmi = loan ? state.emis.find(e => e.loanId===loan.id && e.status!=='paid' && e.status!=='upcoming') : null;
+  let statusPill = '<span class="status-pill upcoming">No Loan</span>';
+  if(loan){
+    if(loan.status==='closed') statusPill = '<span class="status-pill paid">Closed</span>';
+    else if(loan.status==='overdue') statusPill = '<span class="status-pill overdue">Overdue</span>';
+    else statusPill = '<span class="status-pill due">Active</span>';
+  }
+  return `<div class="member-card">
+    <div class="avatar sm">${initials(m.name)}</div>
+    <div class="mc-info"><div class="name">${esc(m.name)}</div><div class="sub">${esc(m.memberCode)} ${loan?('· EMI '+money(loan.emiAmount)):''}</div>${statusPill}</div>
+    <div class="mc-right">
+      <div class="amt" style="font-size:13px;">${loan?money(outstanding):'—'}</div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button class="chip-btn outline" onclick="navigateTo('memberDetail',{memberId:'${m.id}', backTo:'${backTo}'})">View</button>
+        <button class="chip-btn outline" title="Download payment summary" onclick="event.stopPropagation();downloadMemberPaymentSummary('${m.id}')"><i class="fa-solid fa-file-pdf"></i></button>
+        ${nextEmi ? `<button class="chip-btn" onclick="navigateTo('collect',{memberId:'${m.id}', emiId:'${nextEmi.id}'})">Collect</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------------------- MEMBER DETAIL ---------------------------- */
+function loadMemberDetails(memberId){
+  if(!checkMemberPermission(memberId)){ showToast('You are not authorized to view this member','error'); navigateTo('groups'); return; }
+  const m = getMember(memberId); const g = getGroup(m.groupId);
+  const loan = getLoanByMember(memberId);
+  let loanHTML = '';
+  if(loan){
+    let mdProducts = null;
+    if (loan.products) {
+      try { mdProducts = JSON.parse(loan.products); } catch (e) { mdProducts = null; }
+      if (!Array.isArray(mdProducts) || !mdProducts.length) mdProducts = null;
+    }
+    if (!mdProducts && loan.productName) {
+      mdProducts = loan.productName.split(',').map(tok => {
+        tok = tok.trim();
+        const mm = tok.match(/^(.*?)\s*×\s*([\d.]+)\s*$/);
+        return mm ? { name: mm[1].trim(), qty: parseFloat(mm[2]) || 1 } : { name: tok, qty: 1 };
+      }).filter(p => p.name);
+      if (!mdProducts.length) mdProducts = null;
+    }
+    const productsHTML = mdProducts
+      ? `<div class="info-row" style="align-items:flex-start;"><span class="k">Products</span><span class="v" style="text-align:right;max-width:60%;font-family:var(--font-body);font-weight:600;white-space:normal;line-height:1.4;">${mdProducts.map(p => esc(p.name) + (p.qty && p.qty!==1 ? ' ×' + p.qty : '')).join(', ')}</span></div>`
+      : `<div class="info-row"><span class="k">Products</span><span class="v">${esc(loan.productName||'-')}</span></div>`;
+    loanHTML = `
+    <div class="info-card">
+      <h4>Loan Summary (Interest-Free)</h4>
+      ${productsHTML}
+      <div class="info-row"><span class="k">Loan Amount</span><span class="v">${money(loan.loanAmount)}</span></div>
+      <div class="info-row"><span class="k">Total Principal</span><span class="v">${money(loan.totalPrincipal)}</span></div>
+      <div class="info-row"><span class="k">EMI Paid Total</span><span class="v pos">${money(loan.paidPrincipal - (loan.advancePaid||0))}</span></div>
+      ${loan.advancePaid>0 ? `<div class="info-row"><span class="k">Advance Paid</span><span class="v" style="color:var(--primary);font-weight:700;">${money(loan.advancePaid)}</span></div>` : ''}
+      <div class="info-row"><span class="k">Total Paid</span><span class="v pos" style="font-weight:700;">${money(loan.paidPrincipal)}</span></div>
+      <div class="info-row"><span class="k">Remaining Principal</span><span class="v neg">${money(Math.max(0, loan.remainingPrincipal))}</span></div>
+      <div class="info-row"><span class="k">Standard EMI</span><span class="v">${money(loan.emiAmount)}</span></div>
+      ${loan.effectiveNextEmi != null && loan.effectiveNextEmi < loan.emiAmount && loan.effectiveNextEmi > 0 ? `<div class="info-row"><span class="k" style="color:var(--warning);">Next EMI Due</span><span class="v" style="color:var(--warning);font-weight:700;">${money(loan.effectiveNextEmi)} <span style="font-size:11px;font-weight:400;">(adjusted)</span></span></div>` : ''}
+      <div class="info-row"><span class="k">Total EMI</span><span class="v">${loan.totalEmi}</span></div>
+      <div class="info-row"><span class="k">Paid EMI</span><span class="v pos">${loan.paidEmi}</span></div>
+      <div class="info-row"><span class="k">Remaining EMI</span><span class="v">${loan.remainingEmi}</span></div>
+      <div class="info-row"><span class="k">Next Due Date</span><span class="v">${loan.nextDueDate?fmtDateShort(loan.nextDueDate):'—'}</span></div>
+    </div>`;
+  } else {
+    loanHTML = `<div class="info-card"><h4>Loan Summary</h4><div class="empty-state" style="padding:20px;"><i class="fa-solid fa-file-circle-xmark"></i><p>No active loan for this member</p></div></div>`;
+  }
+  const loanCta = loan ? `<button class="btn btn-primary btn-full" style="margin:0 18px 18px;width:calc(100% - 36px)" onclick="collectEMI('${memberId}')"><i class="fa-solid fa-hand-holding-dollar"></i> Collect EMI</button>` : '';
+
+  const personalHTML = `
+    <div class="info-card">
+      <h4>Personal Details</h4>
+      <div class="info-row"><span class="k">Member ID</span><span class="v">${esc(m.memberCode)}</span></div>
+      <div class="info-row"><span class="k">Full Name</span><span class="v">${esc(m.name)}</span></div>
+      <div class="info-row"><span class="k">Gender</span><span class="v">${esc(m.gender || '—')}</span></div>
+      <div class="info-row"><span class="k">Mobile</span><span class="v">${esc(m.mobile)}</span></div>
+      <div class="info-row" style="align-items:flex-start;"><span class="k">Address</span><span class="v" style="text-align:right;max-width:60%;font-family:var(--font-body);font-weight:600;white-space:normal;line-height:1.4;">${esc(m.address || '—')}</span></div>
+      <div class="info-row"><span class="k">Group</span><span class="v">${esc(g?g.name:'—')}</span></div>
+      <div class="info-row"><span class="k">Group Code</span><span class="v">${esc(g?g.groupCode:'—')}</span></div>
+      <div class="info-row"><span class="k">Joining Date</span><span class="v">${fmtDateShort(m.joinDate)}</span></div>
+    </div>`;
+
+  document.getElementById('memberDetailContent').innerHTML = `
+    <div class="detail-hero">
+      <div class="avatar lg" style="margin:0 auto;">${initials(m.name)}</div>
+      <h2>${esc(m.name)}</h2>
+      <div class="sub">${esc(m.memberCode)} · ${esc(m.mobile)}</div>
+      <div class="tags"><span class="tag-chip">${esc(g?g.name:'')}</span></div>
+    </div>
+    <div class="contact-row">
+      <button class="btn btn-call" onclick="callMember('${m.mobile}')"><i class="fa-solid fa-phone"></i> Call</button>
+      <button class="btn btn-wa" onclick="whatsappMember('${m.mobile}','${esc(m.name).replace(/'/g,'')}')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+    </div>
+    <div style="height:14px"></div>
+    ${personalHTML}
+    ${loanHTML}
+    ${loanCta}
+  `;
+}
+function callMember(mobile){ if(!mobile){showToast('No number available','error');return;} window.location.href = 'tel:' + mobile.replace(/\s/g,''); }
+function whatsappMember(mobile,name){ if(!mobile){showToast('No number available','error');return;} const num = mobile.replace(/[^0-9]/g,''); window.open('https://wa.me/'+num+'?text='+encodeURIComponent('Hello '+name+', this is a reminder regarding your EMI collection.'), '_blank'); }
+
+/* ---------------------------- EMI PAGE ---------------------------- */
+function loadEMI(tab){
+  uiTemp.emiTab = tab;
+  const tabs = [
+    {k:'today', l:"Today's"}, {k:'upcoming', l:'Upcoming'}, {k:'pending', l:'Pending'}, {k:'overdue', l:'Overdue'}, {k:'paid', l:'Paid'}
+  ];
+  document.getElementById('emiTabs').innerHTML = tabs.map(t => `<button class="tab-chip ${t.k===tab?'active':''}" onclick="loadEMI('${t.k}')">${t.l}</button>`).join('');
+
+  let list = myEmis();
+  const todayISO = toISODate(todayDate());
+  if(tab==='today') list = list.filter(e => e.status==='due_today' || (e.status==='paid' && e.paidDate===todayISO && e.hasPayment));
+  else if(tab==='upcoming') list = list.filter(e => e.status==='upcoming');
+  else if(tab==='pending') list = list.filter(e => e.status==='due_today' || e.status==='partial');
+  else if(tab==='overdue') list = list.filter(e => e.status==='overdue');
+  else if(tab==='paid') list = list.filter(e => e.status==='paid').sort((a,b)=> (b.paidDate||'').localeCompare(a.paidDate||''));
+
+  document.getElementById('emiList').innerHTML = list.length ? list.slice(0,60).map(e => emiCardHTML(e)).join('') : emptyState('fa-file-invoice','No EMI records in this tab');
+}
+function emiCardHTML(e){
+  const m = getMember(e.memberId); const g = getGroup(e.groupId);
+  const outstanding = e.amount - e.paidAmount;
+  let pill = '<span class="status-pill upcoming">Upcoming</span>';
+  if(e.status==='paid') pill = '<span class="status-pill paid">Paid</span>';
+  else if(e.status==='due_today') pill = '<span class="status-pill due">Due Today</span>';
+  else if(e.status==='overdue') pill = '<span class="status-pill overdue">Overdue</span>';
+  else if(e.status==='partial') pill = '<span class="status-pill partial">Partial</span>';
+  return `<div class="list-card">
+    <div class="lc-top">
+      <div class="avatar sm">${initials(m?m.name:'?')}</div>
+      <div class="lc-info"><div class="name">${esc(m?m.name:'Unknown')}</div><div class="grp">${esc(g?g.name:'')} · EMI #${e.emiNumber}</div></div>
+      <div class="lc-right"><div class="amt amt">${money(e.amount)}</div><div class="time">${e.status==='paid' ? (e.paidTime||''):('Due '+fmtDateDay(e.dueDate))}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      ${pill}
+      ${e.status!=='paid' && e.status!=='upcoming' ? `<button class="btn btn-collect" style="min-height:36px;padding:0 16px;" onclick="navigateTo('collect',{memberId:'${e.memberId}', emiId:'${e.id}'})">Collect EMI</button>` : `<span style="font-size:11px;color:var(--text-faint)">${money(outstanding)} left</span>`}
+    </div>
+  </div>`;
+}
+
+/* ---------------------------- COLLECT EMI FLOW ---------------------------- */
+function collectEMI(memberId){
+  const loan = getLoanByMember(memberId);
+  if(!loan){ showToast('This member has no active loan','error'); return; }
+  const nextEmi = emisForLoan(loan.id).find(e => e.status!=='paid');
+  if(!nextEmi){ showToast('All EMIs are already paid for this member','success'); return; }
+  navigateTo('collect', {memberId, emiId: nextEmi.id});
+}
+function openCollectScreen(memberId, emiId){
+  if(!checkMemberPermission(memberId)){ showToast('Not authorized','error'); navigateTo('home'); return; }
+  uiTemp.collectMemberId = memberId; uiTemp.collectEmiId = emiId; uiTemp.selectedMethod = null;
+  uiTemp.collectFromEmi = (nav.params && nav.params.fromEmi) || false;
+  const m = getMember(memberId); const g = getGroup(m.groupId);
+  const emi = getEmi(emiId); const loan = getLoan(emi.loanId);
+  // Effective outstanding for this EMI slot — may be less than emi.amount when
+  // advance payments have already reduced the remaining principal.
+  const emiOutstanding = emi.amount - emi.paidAmount;
+  const remaining = loan.remainingPrincipal; // already includes advance deductions
+  // If remaining principal is less than this EMI's outstanding, use remaining
+  const outstanding = Math.min(emiOutstanding, remaining > 0 ? remaining : emiOutstanding);
+  const isLastAdjusted = outstanding < emiOutstanding && outstanding > 0;
+  const advancePaid = loan.advancePaid || 0;
+
+  document.getElementById('collectContent').innerHTML = `
+    <div class="collect-summary">
+      <h4 style="font-size:13px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px;">Member</h4>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div class="avatar">${initials(m.name)}</div>
+        <div><div style="font-weight:700;font-size:15px;">${esc(m.name)}</div><div style="font-size:12px;color:var(--text-soft);">${esc(m.memberCode)} · ${esc(g.name)}</div></div>
+      </div>
+      <div class="info-row"><span class="k">Loan Amount</span><span class="v">${money(loan.loanAmount)}</span></div>
+      ${advancePaid>0 ? `<div class="info-row"><span class="k">Advance Paid</span><span class="v" style="color:var(--primary);font-weight:700;">${money(advancePaid)}</span></div>` : ''}
+      <div class="info-row"><span class="k">Remaining Principal</span><span class="v neg">${money(remaining)}</span></div>
+      <div class="info-row"><span class="k">Current EMI (#${emi.emiNumber})</span><span class="v">${money(emi.amount)}</span></div>
+      <div class="info-row"><span class="k">Already Paid</span><span class="v pos">${money(emi.paidAmount)}</span></div>
+      <div class="info-row"><span class="k">Due / Outstanding</span><span class="v neg" style="${isLastAdjusted?'color:var(--warning);font-weight:700;':''}">${money(outstanding)}${isLastAdjusted?' <span style="font-size:11px;font-weight:400;">(adjusted for advance)</span>':''}</span></div>
+    </div>
+
+    <div class="amount-input-wrap">
+      <label>Payment Amount</label>
+      <div class="amount-input-row"><span class="rs">₹</span><input type="number" id="paymentAmountInput" value="${outstanding}" min="1" oninput="updateAdvancePreview()"></div>
+      <div class="outstanding-note">${isLastAdjusted ? `Last EMI reduced to ${money(outstanding)} due to advance payments` : `Outstanding for this EMI: ${money(outstanding)}`}</div>
+      <div class="quick-amt-row">
+        <button class="quick-amt" onclick="setPayAmount(${outstanding})">Full ${money(outstanding)}</button>
+        <button class="quick-amt" onclick="setPayAmount(${Math.round(outstanding/2)})">Half ${money(Math.round(outstanding/2))}</button>
+      </div>
+    </div>
+    <div class="amount-input-wrap" id="advancePreviewWrap" style="display:none;">
+      <label>Advance Payment</label>
+      <div class="amount-input-row"><span class="rs">₹</span><input type="text" id="advancePreviewDisplay" value="0" disabled style="background:var(--primary-tint);font-weight:700;color:var(--primary);"></div>
+      <div class="outstanding-note">The amount above the outstanding EMI is recorded as an advance payment on this loan.</div>
+    </div>
+
+    <div class="section-head"><h3>Payment Method</h3></div>
+    <div class="pm-grid" id="pmGrid">
+      <div class="pm-card" data-m="Cash" onclick="selectMethod('Cash')"><i class="fa-solid fa-money-bill-wave"></i><div class="pl">Cash</div></div>
+      <div class="pm-card" data-m="UPI" onclick="selectMethod('UPI')"><i class="fa-solid fa-qrcode"></i><div class="pl">UPI</div></div>
+      <div class="pm-card" data-m="Bank Transfer" onclick="selectMethod('Bank Transfer')"><i class="fa-solid fa-building-columns"></i><div class="pl">Bank</div></div>
+    </div>
+
+    <div class="fixed-bottom-bar">
+      <button class="btn btn-primary btn-full" onclick="processPayment()"><i class="fa-solid fa-check"></i> Collect Payment</button>
+    </div>
+  `;
+}
+function updateAdvancePreview(){
+  const emi = getEmi(uiTemp.collectEmiId);
+  if(!emi) return;
+  const outstanding = emi.amount - emi.paidAmount;
+  const val = parseFloat(document.getElementById('paymentAmountInput').value) || 0;
+  const advance = Math.max(0, val - outstanding);
+  const wrap = document.getElementById('advancePreviewWrap');
+  const display = document.getElementById('advancePreviewDisplay');
+  if(wrap) wrap.style.display = advance > 0 ? '' : 'none';
+  if(display) display.value = money(advance);
+}
+function setPayAmount(v){ document.getElementById('paymentAmountInput').value = v; updateAdvancePreview(); }
+function selectMethod(m){
+  uiTemp.selectedMethod = m;
+  document.querySelectorAll('#pmGrid .pm-card').forEach(c => c.classList.toggle('selected', c.dataset.m === m));
+}
+
+async function processPayment(){
+  const emi = getEmi(uiTemp.collectEmiId);
+  const loan = getLoan(emi.loanId);
+  const input = document.getElementById('paymentAmountInput');
+  const amount = parseFloat(input.value);
+  const outstanding = emi.amount - emi.paidAmount;
+
+  if(!amount || amount <= 0){ showToast('Enter a valid payment amount','error'); return; }
+  if(!uiTemp.selectedMethod){ showToast('Please select a payment method','error'); return; }
+
+  return withSubmitGuard('processPayment:'+emi.id, async () => {
+  try{
+    const res = await apiPost('payments.php', {emiId: emi.id, amount, method: uiTemp.selectedMethod});
+    const emiPortion = Math.min(amount, outstanding);
+    const advancePortion = Math.max(0, amount - outstanding);
+    applyPaymentLocally(res.payment, emi.id, emiPortion, res.advancePayment);
+    updateLoanBalance(loan.id, amount, advancePortion);
+
+    addNotification('Payment Successful', `${money(amount)} collected from ${getMember(emi.memberId).name} (${getGroup(emi.groupId).name}).` + (advancePortion>0 ? ` Includes ${money(advancePortion)} advance.` : ''), 'payment');
+    uiTemp.lastPaymentId = res.payment ? res.payment.id : null;
+    uiTemp.lastAdvancePaymentId = res.advancePayment ? res.advancePayment.id : null;
+    navigateTo('success');
+  }catch(e){ showToast(e.message,'error'); }
+  });
+}
+
+/** Mirrors the server's committed payment(s) into local state so the rest of the
+ * UI (which reads state.emis/state.payments) updates immediately without a
+ * full re-fetch. Amount above the EMI's outstanding comes back as a second,
+ * separate 'advance' payment row rather than being folded into the EMI one. */
+function applyPaymentLocally(serverPayment, emiId, emiPortion, advancePayment){
+  const emi = getEmi(emiId);
+  if(serverPayment && emiPortion > 0){
+    emi.paidAmount = (emi.paidAmount||0) + emiPortion;
+    emi.paidDate = serverPayment.date;
+    emi.paidTime = serverPayment.time;
+    emi.hasPayment = true;
+    emi.status = (emi.paidAmount >= emi.amount - 0.01) ? 'paid' : 'partial';
+    state.payments.push(Object.assign({}, serverPayment, { emiId: emi.id }));
+  }
+  if(advancePayment){
+    state.payments.push(Object.assign({}, advancePayment, { emiId: null }));
+  }
+}
+function updateLoanBalance(loanId, amount, advancePortion){
+  const loan = getLoan(loanId);
+  loan.paidPrincipal += amount;
+  if(advancePortion > 0) loan.advancePaid = (loan.advancePaid||0) + advancePortion;
+  // Not clamped — keep it consistent with enrichLoansForAgent/Admin's loanOutstanding.
+  loan.remainingPrincipal = loan.remainingPrincipal - amount;
+  // recompute paid/remaining EMI counts from schedule
+  const sched = emisForLoan(loanId);
+  loan.paidEmi = sched.filter(e => e.status === 'paid').length;
+  loan.remainingEmi = loan.totalEmi - loan.paidEmi;
+  const nextUnpaid = sched.find(e => e.status !== 'paid');
+  loan.nextDueDate = nextUnpaid ? nextUnpaid.dueDate : null;
+  // Recalculate effective next EMI (adjusted for advance)
+  const stdEmi = loan.emiAmount || 0;
+  loan.effectiveNextEmi = loan.remainingPrincipal > 0 ? Math.min(stdEmi, loan.remainingPrincipal) : 0;
+  loan.status = loan.remainingPrincipal <= 0.01 ? 'closed' : (sched.some(e=>e.status!=='paid' && e.dueDate < SF.todayISO()) ? 'overdue' : 'active');
+  // Show loan-closed notification in-app if just closed
+  if(loan.status === 'closed'){
+    addNotification('Loan Closed', `Loan ${loan.id} of this member is now fully repaid.`, 'loan_closed');
+  }
+}
+
+function renderSuccessScreen(){
+  const p = uiTemp.lastPaymentId ? state.payments.find(x => x.id === uiTemp.lastPaymentId) : null;
+  const adv = uiTemp.lastAdvancePaymentId ? state.payments.find(x => x.id === uiTemp.lastAdvancePaymentId) : null;
+  const base = p || adv;
+  if(!base){ navigateTo('home'); return; }
+  const m = getMember(base.memberId); const g = getGroup(base.groupId);
+  const totalPaid = (p?p.amount:0) + (adv?adv.amount:0);
+  // Build receipt nav params — include both ids when advance was also collected
+  const receiptParams = p && adv
+    ? {paymentId: p.id, advPaymentId: adv.id}
+    : {paymentId: base.id};
+  document.getElementById('successContent').innerHTML = `
+    <div class="success-wrap">
+      <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+      <h2>Payment Successful</h2>
+      <p style="color:var(--text-soft);font-size:13px;">Collected from ${esc(m.name)}</p>
+      <div class="samt">${money(totalPaid)}</div>
+      <div class="success-detail">
+        <div class="info-row"><span class="k">Member</span><span class="v">${esc(m.name)}</span></div>
+        <div class="info-row"><span class="k">Group</span><span class="v">${esc(g.name)}</span></div>
+        <div class="info-row"><span class="k">Loan ID</span><span class="v">${esc(base.loanId)}</span></div>
+        ${p ? `<div class="info-row"><span class="k">EMI Number</span><span class="v">#${p.emiNumber}</span></div>
+        <div class="info-row"><span class="k">EMI Amount</span><span class="v pos">${money(p.amount)}</span></div>` : ''}
+        ${adv ? `<div class="info-row"><span class="k">Advance Payment</span><span class="v" style="color:var(--primary);font-weight:700;">${money(adv.amount)}</span></div>` : ''}
+        ${p && adv ? `<div class="info-row" style="border-top:1px dashed var(--border);padding-top:8px;margin-top:4px;"><span class="k" style="font-weight:700;">Total Collected</span><span class="v pos" style="font-weight:700;">${money(totalPaid)}</span></div>` : ''}
+        <div class="info-row"><span class="k">Payment Method</span><span class="v">${esc(base.method)}</span></div>
+        <div class="info-row"><span class="k">Transaction ID</span><span class="v" style="font-size:11.5px;">${esc(base.transactionId)}</span></div>
+        <div class="info-row"><span class="k">Receipt No.</span><span class="v">${esc(p ? p.receiptNo : adv.receiptNo)}${adv && p ? ' / ' + esc(adv.receiptNo) : ''}</span></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" style="flex:1" onclick="navigateTo('receipt',${JSON.stringify(receiptParams).replace(/"/g,'&quot;')})"><i class="fa-solid fa-receipt"></i> View Receipt</button>
+        <button class="btn btn-primary" style="flex:1" onclick="navigateTo('home')"><i class="fa-solid fa-check"></i> Done</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------------------- RECEIPT ---------------------------- */
+function generateReceipt(paymentId, advPaymentId){
+  // advPaymentId is set when EMI + advance were collected in the same transaction
+  const p   = paymentId    ? state.payments.find(x => x.id === paymentId)    : null;
+  const adv = advPaymentId ? state.payments.find(x => x.id === advPaymentId) : null;
+  const base = p || adv;
+  if(!base){ navigateTo('home'); return; }
+  const m = getMember(base.memberId); const g = getGroup(base.groupId); const agent = currentAgent();
+  const loan = getLoan(base.loanId);
+  const isCombined = !!(p && adv);
+  const isAdvanceOnly = !p && !!adv;
+  const totalCollected = (p ? p.amount : 0) + (adv ? adv.amount : 0);
+
+  // Receipt header label
+  const receiptLabel = isCombined ? 'EMI + Advance Payment Receipt' : (isAdvanceOnly ? 'Advance Payment Receipt' : 'EMI Payment Receipt');
+
+  // Receipt number(s)
+  const receiptNoLine = isCombined
+    ? `${esc(p.receiptNo)} &amp; ${esc(adv.receiptNo)}`
+    : esc(base.receiptNo);
+
+  // Breakdown rows
+  let breakdownRows = '';
+  if(p){
+    breakdownRows += `
+      <div class="info-row" style="border-top:1px dashed var(--border);padding-top:10px;margin-top:6px;">
+        <span class="k" style="font-weight:700;">EMI #${p.emiNumber} of ${loan ? loan.totalEmi : '—'}</span>
+        <span class="v pos" style="font-weight:700;">${money(p.amount)}</span>
+      </div>`;
+  }
+  if(adv){
+    breakdownRows += `
+      <div class="info-row">
+        <span class="k" style="font-weight:700;color:var(--primary);">Advance Payment</span>
+        <span class="v" style="color:var(--primary);font-weight:700;">${money(adv.amount)}</span>
+      </div>`;
+  }
+  if(isCombined){
+    breakdownRows += `
+      <div class="info-row" style="border-top:2px solid var(--border);padding-top:8px;margin-top:4px;">
+        <span class="k" style="font-weight:800;">Total Collected</span>
+        <span class="v pos" style="font-weight:800;font-size:15px;">${money(totalCollected)}</span>
+      </div>`;
+  }
+
+  document.getElementById('receiptContent').innerHTML = `
+    <div class="receipt-paper" id="printableReceipt">
+      <div class="receipt-head">
+        <div class="rmark"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <h3>SWANIRBHAR SANSAR</h3>
+        <div class="sub">${receiptLabel}</div>
+      </div>
+      <div class="info-row"><span class="k">Receipt No.</span><span class="v">${receiptNoLine}</span></div>
+      <div class="info-row"><span class="k">Date</span><span class="v">${fmtDateShort(base.date)} · ${base.time}</span></div>
+      <div class="info-row"><span class="k">Agent</span><span class="v">${esc(agent.name)} (${esc(agent.id)})</span></div>
+      <div class="info-row"><span class="k">Member</span><span class="v">${esc(m.name)}</span></div>
+      <div class="info-row"><span class="k">Group</span><span class="v">${esc(g.name)}</span></div>
+      <div class="info-row"><span class="k">Loan ID</span><span class="v">${esc(base.loanId)}</span></div>
+      <div class="info-row"><span class="k">Standard EMI</span><span class="v">${loan ? money(loan.emiAmount) : '—'}</span></div>
+      ${breakdownRows}
+      <div class="info-row" style="margin-top:10px;"><span class="k">Remaining Principal</span><span class="v neg">${loan ? money(Math.max(0, loan.remainingPrincipal)) : '—'}</span></div>
+      <div class="info-row"><span class="k">Payment Method</span><span class="v">${esc(base.method)}</span></div>
+      <div class="info-row"><span class="k">Transaction ID</span><span class="v" style="font-size:11px;">${esc(base.transactionId)}</span></div>
+      <div class="receipt-foot">This is a system-generated receipt · No interest charged · Principal-only collection</div>
+    </div>
+    <div class="contact-row">
+      <button class="btn btn-outline" onclick="printReceipt()"><i class="fa-solid fa-print"></i> Print</button>
+      <button class="btn btn-outline" onclick="shareReceipt()"><i class="fa-solid fa-share-nodes"></i> Share</button>
+      <button class="btn btn-primary" onclick="navigateTo('home')"><i class="fa-solid fa-xmark"></i> Close</button>
+    </div>
+  `;
+}
+function _getReceiptHTML(){
+  // Grab the receipt paper's outer HTML and wrap it in a self-contained
+  // page (inline styles from the parent document included) so the new
+  // window/image renders correctly without needing the full app loaded.
+  const el = document.getElementById('printableReceipt');
+  if(!el) return null;
+  // Pull only the CSS vars and receipt-specific rules we need
+  const styles = Array.from(document.styleSheets).reduce((acc, ss)=>{
+    try{ return acc + Array.from(ss.cssRules).map(r=>r.cssText).join('\n'); }
+    catch(e){ return acc; }
+  }, '');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Payment Receipt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+      body{margin:0;padding:16px;background:#f5f5f5;font-family:sans-serif;display:flex;justify-content:center;}
+      ${styles}
+      @media print{body{background:#fff;padding:0;} .no-print{display:none;}}
+    </style>
+  </head><body>
+    ${el.outerHTML}
+    <div class="no-print" style="margin-top:20px;text-align:center;">
+      <button onclick="window.print()" style="padding:10px 28px;font-size:15px;background:#12704f;color:#fff;border:none;border-radius:8px;cursor:pointer;">
+        <i class="fa-solid fa-print"></i> Print
+      </button>
+    </div>
+  </body></html>`;
+}
+
+function printReceipt(){
+  const html = _getReceiptHTML();
+  if(!html){ showToast('Receipt not ready yet.','error'); return; }
+  const w = window.open('','_blank');
+  if(!w){ showToast('Please allow pop-ups for this site to print.','error'); return; }
+  w.document.write(html);
+  w.document.close();
+  // Small delay so fonts/icons finish loading before print dialog opens
+  setTimeout(()=>{ w.focus(); w.print(); }, 600);
+}
+
+async function shareReceipt(){
+  const el = document.getElementById('printableReceipt');
+  if(!el){ showToast('Receipt not ready yet.','error'); return; }
+  if(!window.html2canvas){ showToast('Image library not loaded yet. Try again in a moment.','error'); return; }
+  showToast('Preparing receipt image…');
+  try{
+    const canvas = await html2canvas(el, {
+      scale: 2, useCORS: true, backgroundColor:'#ffffff', logging: false,
+    });
+    // Convert to blob and trigger a download — user can then share from gallery/files
+    canvas.toBlob(blob => {
+      if(!blob){ showToast('Could not create receipt image.','error'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'receipt-' + Date.now() + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(()=> URL.revokeObjectURL(url), 5000);
+      showToast('Receipt saved — share it from your gallery or Files app.','success');
+    }, 'image/png');
+  }catch(e){
+    showToast('Could not save receipt: ' + e.message,'error');
+  }
+}
+
+/* ---------------------------- COLLECTION PAGE ---------------------------- */
+function loadCollectionHistory(){
+  const payments = myPayments().slice().sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+  const todayISO = toISODate(todayDate());
+  const weekAgo = toISODate(addDays(todayDate(),-7));
+  const todayTotal = payments.filter(p=>p.date===todayISO).reduce((s,p)=>s+p.amount,0);
+  const weekTotal = payments.filter(p=>p.date>=weekAgo).reduce((s,p)=>s+p.amount,0);
+
+  document.getElementById('collectionContent').innerHTML = `
+    <div class="stat-scroll" style="padding-top:4px;">
+      <div class="stat-card"><div class="si green"><i class="fa-solid fa-calendar-day"></i></div><div class="t">Today</div><div class="v">${money(todayTotal)}</div></div>
+      <div class="stat-card"><div class="si blue"><i class="fa-solid fa-calendar-week"></i></div><div class="t">This Week</div><div class="v">${money(weekTotal)}</div></div>
+    </div>
+    <div class="section-head"><h3>Recent Payments</h3></div>
+    ${payments.length ? payments.slice(0,25).map(p => collectionHistoryCardHTML(p)).join('') : emptyState('fa-inbox','No collection history yet')}
+  `;
+}
+function collectionHistoryCardHTML(p){
+  const m = getMember(p.memberId); const g = getGroup(p.groupId);
+  const isAdvance = p.type === 'advance';
+  // Check if this EMI payment has a paired advance payment collected same day
+  const paired = isAdvance ? null
+    : state.payments.find(x => x.loanId === p.loanId && x.type === 'advance'
+        && x.date === p.date && x.memberId === p.memberId
+        && x.id === p.id + 'A');
+  // Suppress standalone advance rows that are already shown paired with their EMI
+  if(isAdvance){
+    const hasEmiPair = state.payments.find(x => x.loanId === p.loanId && x.type !== 'advance'
+      && x.date === p.date && x.memberId === p.memberId
+      && p.id === x.id + 'A');
+    if(hasEmiPair) return ''; // will be shown as part of the EMI card
+  }
+  const totalShown = p.amount + (paired ? paired.amount : 0);
+  const typeLabel = isAdvance
+    ? '<span style="font-size:11px;background:var(--primary-tint);color:var(--primary);border-radius:4px;padding:1px 6px;font-weight:700;">Advance</span>'
+    : paired
+      ? '<span style="font-size:11px;background:#f0fdf4;color:#16a34a;border-radius:4px;padding:1px 6px;font-weight:700;">EMI + Advance</span>'
+      : '<span style="font-size:11px;background:var(--bg-alt);color:var(--text-soft);border-radius:4px;padding:1px 6px;">EMI #' + p.emiNumber + '</span>';
+  const receiptParams = paired
+    ? JSON.stringify({paymentId: p.id, advPaymentId: paired.id}).replace(/"/g, '&quot;')
+    : JSON.stringify({paymentId: p.id}).replace(/"/g, '&quot;');
+  return `<div class="list-card">
+    <div class="lc-top">
+      <div class="avatar sm">${initials(m?m.name:'?')}</div>
+      <div class="lc-info">
+        <div class="name">${esc(m?m.name:'Unknown')} ${typeLabel}</div>
+        <div class="grp">${esc(g?g.name:'')} · ${fmtDateDay(p.date)} · ${p.time}</div>
+      </div>
+      <div class="lc-right">
+        <div class="amt amt" style="${paired?'color:var(--success,#16a34a);':''}">${money(totalShown)}</div>
+        ${paired ? `<div style="font-size:11px;color:var(--text-faint);">EMI ${money(p.amount)} + Adv ${money(paired.amount)}</div>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11.5px;color:var(--text-soft);"><i class="fa-solid fa-credit-card"></i> ${esc(p.method)} · ${esc(p.receiptNo)}</span>
+      <button class="chip-btn outline" style="font-size:11px;padding:2px 10px;" onclick="navigateTo('receipt',${receiptParams})"><i class="fa-solid fa-receipt"></i> Receipt</button>
+    </div>
+  </div>`;
+}
+/* ---------------------------- DUE PAGE ---------------------------- */
+function loadDueList(filter){
+  uiTemp.dueTab = filter;
+  const tabs = [{k:'today',l:"Today's Due"},{k:'upcoming',l:'Upcoming'},{k:'pending',l:'Pending'},{k:'overdue',l:'Overdue'}];
+  document.getElementById('dueTabs').innerHTML = tabs.map(t => `<button class="tab-chip ${t.k===filter?'active':''}" onclick="loadDueList('${t.k}')">${t.l}</button>`).join('');
+  let list = myEmis();
+  const todayISO = toISODate(todayDate());
+  if(filter==='today') list = list.filter(e=>e.status==='due_today' && isLoanActive(e.loanId));
+  else if(filter==='upcoming') list = list.filter(e=>e.status==='upcoming' && isLoanActive(e.loanId)).sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).slice(0,30);
+  else if(filter==='pending') list = list.filter(e=>(e.status==='due_today'||e.status==='partial') && isLoanActive(e.loanId));
+  else if(filter==='overdue') list = list.filter(e=>e.dueDate < todayISO && e.status !== 'paid' && isLoanActive(e.loanId));
+  document.getElementById('dueList').innerHTML = list.length ? list.map(e => dueListCardHTML(e)).join('') : emptyState('fa-calendar-check','Nothing to show here');
+}
+function dueListCardHTML(e){
+  const m = getMember(e.memberId); const g = getGroup(e.groupId);
+  const outstanding = e.amount - e.paidAmount;
+  let pill = (e.dueDate < toISODate(todayDate()) && e.status !== 'paid') ? '<span class="status-pill overdue">Overdue</span>' : e.status==='upcoming' ? '<span class="status-pill upcoming">Upcoming</span>' : '<span class="status-pill due">Due</span>';
+  return `<div class="list-card">
+    <div class="lc-top">
+      <div class="avatar sm">${initials(m?m.name:'?')}</div>
+      <div class="lc-info"><div class="name">${esc(m?m.name:'Unknown')}</div><div class="grp">${esc(g?g.name:'')}</div></div>
+      <div class="lc-right"><div class="amt amt">${money(outstanding)}</div><div class="time">${fmtDateDay(e.dueDate)}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      ${pill}
+      ${e.status!=='upcoming' ? `<button class="btn btn-collect" style="min-height:36px;padding:0 16px;" onclick="navigateTo('collect',{memberId:'${e.memberId}', emiId:'${e.id}'})">Collect</button>` : `<span style="font-size:11px;color:var(--text-faint)">${e.status}</span>`}
+    </div>
+  </div>`;
+}
+
+/* ---------------------------- OVERDUE PAGE ---------------------------- */
+function loadOverdueList(){
+  const todayISO = toISODate(todayDate());
+  // Include partially-paid overdue EMIs too, same as the Admin panel's Overdue
+  // page — a 'partial' status EMI whose due date has passed is still overdue.
+  const list = myEmis().filter(e=>e.dueDate < todayISO && e.status !== 'paid' && isLoanActive(e.loanId)).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  document.getElementById('overdueList').innerHTML = list.length ? list.map(e => overdueCardHTML(e)).join('') : emptyState('fa-thumbs-up','No overdue members. Great work!');
+}
+
+/* ---------------------------- SEARCH ---------------------------- */
+function performSearch(q){
+  q = q.trim().toLowerCase();
+  const box = document.getElementById('searchResults');
+  if(!q){ box.innerHTML=''; return; }
+  const ids = myGroupIds();
+  const members = state.members.filter(m => ids.includes(m.groupId) && (m.name.toLowerCase().includes(q) || m.mobile.toLowerCase().includes(q) || m.memberCode.toLowerCase().includes(q)));
+  const groups = state.groups.filter(g => ids.includes(g.id) && g.name.toLowerCase().includes(q));
+  const loans = state.loans.filter(l => ids.includes(l.groupId) && l.id.toLowerCase().includes(q));
+  const payments = myPayments().filter(p => p.transactionId.toLowerCase().includes(q) || p.receiptNo.toLowerCase().includes(q));
+
+  let html = '';
+  if(members.length) html += `<div class="section-head"><h3>Members</h3></div>` + members.map(m=>memberCardHTML(m, 'search')).join('');
+  if(groups.length) html += `<div class="section-head"><h3>Groups</h3></div>` + groups.map(g=>groupMiniListRow(g)).join('');
+  if(loans.length) html += `<div class="section-head"><h3>Loans</h3></div>` + loans.map(l=>{
+    const m = getMember(l.memberId);
+    return `<div class="list-card"><div class="lc-top"><div class="avatar sm">${initials(m.name)}</div><div class="lc-info"><div class="name">${esc(m.name)}</div><div class="grp">Loan ${esc(l.id)}</div></div><div class="lc-right"><div class="amt amt">${money(Math.max(0, l.remainingPrincipal))}</div></div></div><button class="btn btn-outline" onclick="navigateTo('memberDetail',{memberId:'${m.id}',backTo:'search'})">View Member</button></div>`;
+  }).join('');
+  if(payments.length) html += `<div class="section-head"><h3>Transactions</h3></div>` + payments.map(p=>collectionHistoryCardHTML(p)).join('');
+  if(!html) html = emptyState('fa-magnifying-glass','No results found in your assigned groups');
+  box.innerHTML = html;
+}
+function groupMiniListRow(g){
+  return `<div class="list-card" onclick="navigateTo('groupDetail',{groupId:'${g.id}'})"><div class="lc-top"><div class="avatar sm"><i class="fa-solid fa-people-group"></i></div><div class="lc-info"><div class="name">${esc(g.name)}</div><div class="grp">${esc(g.groupCode)}</div></div></div></div>`;
+}
+
+/* ---------------------------- NOTIFICATIONS ---------------------------- */
+function loadNotifications(){
+  const agent = currentAgent();
+  const list = state.notifications.filter(n => n.agentId === agent.id).sort((a,b)=> new Date(b.date)-new Date(a.date));
+  const iconMap = { group:['fa-people-group','blue'], reminder:['fa-calendar-day','amber'], overdue:['fa-triangle-exclamation','red'], payment:['fa-circle-check','green'], admin:['fa-bullhorn','blue'], loan_closed:['fa-lock','green'] };
+  document.getElementById('notifList').innerHTML = list.length ? list.map(n => {
+    const [icon,cls] = iconMap[n.type] || ['fa-bell','blue'];
+    const timeAgo = timeSince(n.date);
+    const loanClosedBorder = n.type==='loan_closed' ? 'border-left:3px solid #22c55e;' : '';
+    return `<div class="notif-card ${n.read?'':'unread'}" style="${loanClosedBorder}" onclick="readNotification('${n.id}')">
+      <div class="ni si ${cls}"><i class="fa-solid ${icon}"></i></div>
+      <div class="nc-info"><h5>${esc(n.title)}</h5><p>${esc(n.message)}</p><div class="time">${timeAgo}</div></div>
+      ${!n.read ? '<div class="notif-dot"></div>' : ''}
+    </div>`;
+  }).join('') : emptyState('fa-bell-slash','No notifications yet');
+}
+function timeSince(iso){
+  const diff = (Date.now() - new Date(iso).getTime())/1000;
+  if(diff < 3600) return Math.max(1,Math.round(diff/60)) + 'm ago';
+  if(diff < 86400) return Math.round(diff/3600) + 'h ago';
+  return Math.round(diff/86400) + 'd ago';
+}
+function readNotification(id){
+  const n = state.notifications.find(x=>x.id===id);
+  if(n){
+    n.read = true; loadNotifications(); loadDashboard();
+    if(/^\d+$/.test(id)) apiPut(`notifications.php?id=${encodeURIComponent(id)}`, {}).catch(()=>{});
+  }
+}
+function markAllRead(){
+  const agent = currentAgent();
+  state.notifications.forEach(n => { if(n.agentId===agent.id) n.read = true; });
+  loadNotifications(); loadDashboard();
+  apiPut('notifications.php?markAllRead=1', {}).catch(()=>{});
+  showToast('All notifications marked as read','success');
+}
+function addNotification(title,message,type){
+  const agent = currentAgent();
+  state.notifications.unshift({ id:uid('N'), agentId: agent.id, title, message, type, read:false, date:new Date().toISOString() });
+  playNotificationSound();
+}
+function playNotificationSound(){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    const ctx = new Ctx();
+    const now = ctx.currentTime;
+    // two-note gentle chime
+    [{f:880, t:0, d:0.16}, {f:1174.66, t:0.13, d:0.22}].forEach(note => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(note.f, now + note.t);
+      gain.gain.setValueAtTime(0, now + note.t);
+      gain.gain.linearRampToValueAtTime(0.22, now + note.t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + note.t + note.d);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + note.t);
+      osc.stop(now + note.t + note.d + 0.02);
+    });
+    setTimeout(()=>{ ctx.close(); }, 700);
+  }catch(err){ /* audio not available, ignore */ }
+}
+
+/* ---------------------------- PROFILE ---------------------------- */
+function loadProfile(){
+  const agent = currentAgent();
+  const groups = myGroups();
+  document.getElementById('profileContent').innerHTML = `
+    <div class="profile-hero">
+      <div class="avatar lg" style="${agent.photo?'overflow:hidden;padding:0;':''}">${agent.photo?`<img src="${agent.photo}" style="width:100%;height:100%;object-fit:cover;">`:initials(agent.name)}</div>
+      <h2>${esc(agent.name)}</h2>
+      <div class="sub">${esc(agent.id)} · Collection Agent</div>
+      <span class="status-pill">${esc(agent.status)}</span>
+    </div>
+    <div class="info-card" style="margin-top:-14px;">
+      <h4>Agent Information</h4>
+      <div class="info-row"><span class="k">Agent ID</span><span class="v">${esc(agent.id)}</span></div>
+      <div class="info-row"><span class="k">Branch</span><span class="v">${esc(agent.branchName || '-')}</span></div>
+      <div class="info-row"><span class="k">Mobile</span><span class="v">${esc(agent.mobile)}</span></div>
+      <div class="info-row"><span class="k">Email</span><span class="v" style="font-size:12px;">${esc(agent.email)}</span></div>
+      <div class="info-row"><span class="k">Joining Date</span><span class="v">${fmtDateShort(agent.joinDate)}</span></div>
+      <div class="info-row"><span class="k">Status</span><span class="v pos">${esc(agent.status)}</span></div>
+    </div>
+    <div class="section-head"><h3>Assigned Groups</h3></div>
+    <div class="group-scroll">${groups.map(g=>groupMiniCardHTML(g)).join('')}</div>
+    <div class="menu-block">
+      <div class="menu-row" onclick="showChangePasswordModal()"><i class="mi fa-solid fa-key"></i><span>Change Password</span><i class="fa-solid fa-chevron-right" style="color:var(--text-faint)"></i></div>
+      <div class="menu-row" onclick="showToast('Support: helpdesk@swanirbhar.in · 1800-123-456')"><i class="mi fa-solid fa-headset"></i><span>Support</span><i class="fa-solid fa-chevron-right" style="color:var(--text-faint)"></i></div>
+      <div class="menu-row" onclick="confirmLogout()"><i class="mi fa-solid fa-arrow-right-from-bracket" style="background:var(--danger-tint);color:var(--danger)"></i><span style="color:var(--danger)">Logout</span></div>
+    </div>
+  `;
+}
+
+/* ---------------------------- MEMBER LOAN DETAILS PDF ---------------------------- */
+function pdfRs(n){ return 'Rs. ' + Math.round(n||0).toLocaleString('en-IN'); }
+function pdfFreqLabel(f){ return f ? (f.charAt(0).toUpperCase()+f.slice(1)) : '-'; }
+function pdfStatusLabel(s){ return s ? String(s).replace('_',' ').replace(/\b\w/g,c=>c.toUpperCase()) : '-'; }
+function downloadMemberPaymentSummary(memberId){
+  const m = getMember(memberId); if(!m){ showToast('Member not found','error'); return; }
+  if(!window.jspdf){ showToast('PDF library failed to load. Check your connection.','error'); return; }
+  const g = getGroup(m.groupId);
+  const agent = g ? state.agents.find(a => a.id === g.agentId) : null;
+  // ALL loans this member has ever taken (active + completed), newest first —
+  // not just the single current one, so the PDF is a complete record.
+  const memberLoans = state.loans.filter(l => l.memberId === m.id)
+    .sort((a,b) => (b.startDate||'').localeCompare(a.startDate||''));
+  const memberPayments = state.payments.filter(p => p.memberId === m.id).sort((a,b)=> (a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 40;
+  const green = [11,61,46];
+  const goldAccent = [216,161,60];
+  const softText = [95,115,108];
+  const border = [230,236,233];
+
+  // ---- Header banner ----
+  doc.setFillColor(...green);
+  doc.rect(0, 0, pageW, 92, 'F');
+  doc.setFillColor(...goldAccent);
+  doc.rect(0, 92, pageW, 3, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(20);
+  doc.text('SWANIRBHAR SANSAR', marginX, 38);
+  doc.setFont('helvetica','normal'); doc.setFontSize(11);
+  doc.text('Member Loan & Payment Statement', marginX, 58);
+  doc.setFontSize(9); doc.setTextColor(230,236,233);
+  const _gd = new Date(); const genDate = String(_gd.getDate()).padStart(2,'0')+'/'+String(_gd.getMonth()+1).padStart(2,'0')+'/'+_gd.getFullYear();
+  doc.text('Generated on ' + genDate, pageW - marginX, 38, {align:'right'});
+  if(agent && agent.branchName){
+    doc.text(agent.branchName, pageW - marginX, 52, {align:'right'});
+  }
+
+  let y = 122;
+  function ensureSpace(minHeight){
+    const pageH = doc.internal.pageSize.getHeight();
+    if(y + minHeight > pageH - 50){ doc.addPage(); y = 40; }
+  }
+  function sectionTitle(label){
+    ensureSpace(50);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(...green);
+    doc.text(label, marginX, y);
+    y += 8;
+    doc.setDrawColor(...border); doc.setLineWidth(1);
+    doc.line(marginX, y, pageW - marginX, y);
+    y += 16;
+  }
+  function subTitle(label){
+    ensureSpace(30);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(178,128,30);
+    doc.text(label, marginX, y);
+    y += 14;
+  }
+
+  // ---- Member Details ----
+  sectionTitle('Member Details');
+  doc.autoTable({
+    startY: y - 16,
+    margin: { left: marginX, right: marginX },
+    theme: 'plain',
+    styles: { fontSize: 9.5, cellPadding: {top:4,bottom:4,left:0,right:6}, textColor: [18,32,27] },
+    columnStyles: { 0:{fontStyle:'bold',textColor:softText,cellWidth:90}, 1:{cellWidth:150}, 2:{fontStyle:'bold',textColor:softText,cellWidth:90}, 3:{cellWidth:'auto'} },
+    body: [
+      ['Member ID', m.memberCode, 'Group', g ? g.name : '-'],
+      ['Name', m.name, 'Group ID', g ? g.id : '-'],
+      ['Mobile', m.mobile, 'Area', g ? g.area : '-'],
+      ['Joined', fmtDateShort(m.joinDate), 'Branch', agent && agent.branchName ? agent.branchName : '-'],
+    ]
+  });
+  y = doc.lastAutoTable.finalY + 22;
+
+  // ---- Loans Overview (all loans, at a glance) ----
+  sectionTitle('Loans Overview (' + memberLoans.length + ')');
+  if(memberLoans.length){
+    doc.autoTable({
+      startY: y - 16,
+      margin: { left: marginX, right: marginX },
+      theme: 'grid',
+      headStyles: { fillColor: green, textColor: 255, fontStyle:'bold', fontSize:8.5 },
+      bodyStyles: { fontSize: 8.5, textColor: [18,32,27] },
+      styles: { cellPadding: 5.5, lineColor: border, lineWidth: 0.75 },
+      head: [['Loan ID','Product','Loan Amount','Frequency','Status','Paid','Outstanding']],
+      body: memberLoans.map(l => [
+        l.id, l.productName || '-', pdfRs(l.amount), pdfFreqLabel(l.frequency),
+        pdfStatusLabel(l.status), pdfRs(l.paidPrincipal), pdfRs(Math.max(0, l.remainingPrincipal))
+      ])
+    });
+    y = doc.lastAutoTable.finalY + 24;
+  } else {
+    doc.setFont('helvetica','italic'); doc.setFontSize(9.5); doc.setTextColor(...softText);
+    doc.text('No loans taken by this member.', marginX, y);
+    y += 26;
+  }
+
+  // ---- Full detail block, per loan: product/loan details, EMI schedule, advances ----
+  memberLoans.forEach((loan, idx) => {
+    const sched = emisForLoan(loan.id);
+    const advances = memberPayments.filter(p => p.loanId === loan.id && p.type === 'advance');
+
+    sectionTitle('Loan ' + (idx+1) + ' of ' + memberLoans.length + ' — ' + loan.id);
+
+    // Product / loan details
+    subTitle('Product & Loan Details');
+
+    // Structured product line items (name/qty/price), saved at loan creation.
+    // Older loans only have a single comma-joined productName string (e.g.
+    // "Item A ×2, Item B ×1") — parse that into rows too, so every loan's
+    // products render as a proper multi-row bill, never one jammed line.
+    let agProducts = null;
+    if (loan.products) {
+      try { agProducts = JSON.parse(loan.products); } catch (e) { agProducts = null; }
+      if (!Array.isArray(agProducts) || !agProducts.length) agProducts = null;
+    }
+    let agHasPrice = !!agProducts;
+    if (!agProducts && loan.productName) {
+      agProducts = loan.productName.split(',').map(tok => {
+        tok = tok.trim();
+        const m = tok.match(/^(.*?)\s*×\s*([\d.]+)\s*$/);
+        return m ? { name: m[1].trim(), qty: parseFloat(m[2]) || 1 } : { name: tok, qty: 1 };
+      }).filter(p => p.name);
+      if (!agProducts.length) agProducts = null;
+    }
+
+    doc.autoTable({
+      startY: y,
+      margin: { left: marginX, right: marginX },
+      theme: 'plain',
+      styles: { fontSize: 9.5, cellPadding: {top:4,bottom:4,left:0,right:6}, textColor: [18,32,27] },
+      columnStyles: { 0:{fontStyle:'bold',textColor:softText,cellWidth:100}, 1:{cellWidth:150}, 2:{fontStyle:'bold',textColor:softText,cellWidth:100}, 3:{cellWidth:'auto'} },
+      body: [
+        ['Loan / Product Value', pdfRs(loan.amount), 'Advance Amount', pdfRs(loan.advanceAmount)],
+        ['Advance Paid Total', pdfRs(advances.reduce((s,p)=>s+(p.amount||0),0)), 'Frequency', pdfFreqLabel(loan.frequency)],
+        ['EMI Amount', pdfRs(loan.emiAmount), 'Total EMIs', String(loan.totalEmi)],
+        ['Status', pdfStatusLabel(loan.status), 'Start Date', fmtDateShort(loan.startDate)],
+        ['First EMI Date', fmtDateShort(loan.firstEmiDate), 'Paid Principal', pdfRs(loan.paidPrincipal)],
+        ['Outstanding', pdfRs(Math.max(0, loan.remainingPrincipal)), 'Paid EMIs', String(loan.paidEmi)],
+        ['Remaining EMIs', String(loan.remainingEmi), 'Next Due Date', loan.nextDueDate ? fmtDateShort(loan.nextDueDate) : '-'],
+        ['Disbursed Date', loan.disbursedDate ? fmtDateShort(loan.disbursedDate) : '-', '', ''],
+      ]
+    });
+    y = doc.lastAutoTable.finalY + 18;
+
+    // Product bill — invoice-style itemized table (Sr, Product, Rate, Qty, Amount),
+    // one row per product, mirroring a standard bill layout.
+    if (agProducts) {
+      subTitle('Product Bill');
+      const totalQty = agProducts.reduce((s,p)=>s+(p.qty||0),0);
+      const totalAmt = agProducts.reduce((s,p)=>s+((p.qty||0)*(p.price||0)),0);
+      doc.autoTable({
+        startY: y,
+        margin: { left: marginX, right: marginX },
+        theme: 'grid',
+        headStyles: { fillColor: green, textColor: 255, fontStyle:'bold', fontSize:8.5 },
+        bodyStyles: { fontSize: 8.5, textColor: [18,32,27] },
+        styles: { cellPadding: 5.5, lineColor: border, lineWidth: 0.75 },
+        columnStyles: { 0:{cellWidth:30,halign:'center'}, 1:{cellWidth:'auto'}, 2:{cellWidth:70,halign:'right'}, 3:{cellWidth:50,halign:'right'}, 4:{cellWidth:90,halign:'right'} },
+        head: [['Sr.', 'Product', 'Rate', 'Qty', 'Amount']],
+        body: agProducts.map((p,i) => [
+          String(i+1), p.name || '-',
+          agHasPrice ? pdfRs(p.price) : '-', String(p.qty || 0),
+          agHasPrice ? pdfRs((p.qty||0) * (p.price||0)) : '-'
+        ]),
+        foot: agHasPrice ? [['', '', '', String(totalQty), pdfRs(totalAmt)]] : undefined,
+        footStyles: { fillColor: [228,245,238], textColor: green, fontStyle:'bold', fontSize:8.5, halign:'right' }
+      });
+      y = doc.lastAutoTable.finalY + 18;
+    }
+
+    // Full EMI schedule (every installment, with status)
+    subTitle('EMI Schedule (' + sched.length + ' installments)');
+    doc.autoTable({
+      startY: y,
+      margin: { left: marginX, right: marginX },
+      theme: 'grid',
+      headStyles: { fillColor: green, textColor: 255, fontStyle:'bold', fontSize:8.5 },
+      bodyStyles: { fontSize: 8.5, textColor: [18,32,27] },
+      styles: { cellPadding: 5, lineColor: border, lineWidth: 0.75 },
+      head: [['#','Due Date','EMI Amount','Paid Amount','Balance','Status','Paid Date']],
+      body: sched.length ? sched.map(e => [
+        e.emiNumber, fmtDateShort(e.dueDate), pdfRs(e.amount), pdfRs(e.paidAmount),
+        pdfRs(e.amount - (e.paidAmount||0)), pdfStatusLabel(e.status), e.paidDate ? fmtDateShort(e.paidDate) : '-'
+      ]) : [['-','No EMI schedule generated yet','-','-','-','-','-']]
+    });
+    y = doc.lastAutoTable.finalY + 18;
+
+    // Advance payments against this loan, if any
+    if(advances.length){
+      subTitle('Advance Payments on this Loan');
+      doc.autoTable({
+        startY: y,
+        margin: { left: marginX, right: marginX },
+        theme: 'grid',
+        headStyles: { fillColor: [228,245,238], textColor: green, fontStyle:'bold', fontSize:8.5 },
+        bodyStyles: { fontSize: 8.5, textColor: [18,32,27] },
+        styles: { cellPadding: 5, lineColor: border, lineWidth: 0.75 },
+        head: [['Date','Amount','Method','Txn Ref']],
+        body: advances.map(p => [fmtDateShort(p.date), pdfRs(p.amount), p.method || '-', p.transactionId || '-'])
+      });
+      y = doc.lastAutoTable.finalY + 18;
+    }
+    y += 6;
+  });
+
+  // ---- Full Payment History (across all loans) ----
+  sectionTitle('Payment History (' + memberPayments.length + ')');
+  doc.autoTable({
+    startY: y - 16,
+    margin: { left: marginX, right: marginX },
+    theme: 'grid',
+    headStyles: { fillColor: green, textColor: 255, fontStyle:'bold', fontSize:8.5 },
+    bodyStyles: { fontSize: 8.5, textColor: [18,32,27] },
+    styles: { cellPadding: 5.5, lineColor: border, lineWidth: 0.75 },
+    head: [['Date','Loan ID','Installment','Amount','Method','Txn Ref','Status']],
+    body: memberPayments.length ? memberPayments.map(p => [
+      fmtDateShort(p.date), p.loanId, p.type === 'advance' ? 'Advance' : ('#' + p.emiNumber), pdfRs(p.amount), p.method, p.transactionId, 'Success'
+    ]) : [['No payment history yet','-','-','-','-','-','-']]
+  });
+
+  // ---- Footer on every page ----
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    const pageH = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(...border); doc.setLineWidth(0.75);
+    doc.line(marginX, pageH-34, pageW-marginX, pageH-34);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...softText);
+    doc.text('SWANIRBHAR SANSAR · Confidential Member Statement', marginX, pageH-20);
+    doc.text('Page ' + i + ' of ' + pageCount, pageW-marginX, pageH-20, {align:'right'});
+  }
+
+  doc.save('Loan-Details-' + m.memberCode + '.pdf');
+  showToast('Loan details downloaded','success');
+}
+
+/* ---------------------------- SIDE MENU ---------------------------- */
+function openSideMenu(){
+  const agent = currentAgent();
+  const smAvatarEl = document.getElementById('smAvatar');
+  if(agent.photo){ smAvatarEl.style.cssText += 'overflow:hidden;padding:0;'; smAvatarEl.innerHTML = `<img src="${agent.photo}" style="width:100%;height:100%;object-fit:cover;">`; }
+  else smAvatarEl.textContent = initials(agent.name);
+  document.getElementById('smName').textContent = agent.name;
+  document.getElementById('smId').textContent = agent.id + ' · Agent';
+  document.getElementById('sideMenu').classList.add('open');
+  document.getElementById('sideMenuOverlay').classList.add('open');
+}
+function closeSideMenu(){
+  document.getElementById('sideMenu').classList.remove('open');
+  document.getElementById('sideMenuOverlay').classList.remove('open');
+}
+
+/* ---------------------------- TOASTS ---------------------------- */
+function showToast(msg, type){
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' '+type : '');
+  const icon = type==='error' ? 'fa-circle-exclamation' : type==='success' ? 'fa-circle-check' : 'fa-info-circle';
+  t.innerHTML = `<i class="fa-solid ${icon}"></i><span>${esc(msg)}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(-10px)'; t.style.transition='all .25s ease'; setTimeout(()=>t.remove(),260); }, 2600);
+}
+
+/* ---------------------------- MODAL / CONFIRM SHEET ---------------------------- */
+function openModal(opts){
+  const sheet = document.getElementById('modalSheet');
+  sheet.innerHTML = `
+    <div class="sheet-icon"><i class="fa-solid ${opts.icon || 'fa-circle-info'}"></i></div>
+    <h3>${esc(opts.title)}</h3>
+    <p>${esc(opts.body)}</p>
+    <div class="sheet-actions">
+      ${opts.hideCancel ? '' : '<button class="btn btn-outline" onclick="closeModal()">Cancel</button>'}
+      <button class="btn ${opts.confirmClass || 'btn-primary'}" id="modalConfirmBtn">${esc(opts.confirmLabel || 'Confirm')}</button>
+    </div>
+  `;
+  document.getElementById('modalConfirmBtn').onclick = opts.onConfirm;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function showCollectionBreakdown(){
+  const todayISO = toISODate(todayDate());
+  const paymentsToday = myPayments().filter(p => p.date === todayISO);
+
+  const groups = { 'UPI':{amt:0,count:0}, 'Cash':{amt:0,count:0}, 'Bank Transfer':{amt:0,count:0} };
+  paymentsToday.forEach(p => {
+    const key = groups[p.method] ? p.method : 'Cash';
+    groups[key].amt += p.amount;
+    groups[key].count += 1;
+  });
+  const total = paymentsToday.reduce((s,p)=>s+p.amount,0);
+
+  const rows = [
+    { key:'UPI', label:'UPI', icon:'fa-qrcode', cls:'upi' },
+    { key:'Cash', label:'Cash', icon:'fa-money-bill-wave', cls:'cash' },
+    { key:'Bank Transfer', label:'Bank Transfer', icon:'fa-building-columns', cls:'bank' },
+  ].map(r => {
+    const g = groups[r.key];
+    return `<div class="cb-row">
+      <div class="cb-icon ${r.cls}"><i class="fa-solid ${r.icon}"></i></div>
+      <div class="cb-info"><div class="cb-label">${r.label}</div><div class="cb-count">${g.count} ${g.count===1?'payment':'payments'}</div></div>
+      <div class="cb-amt">${money(g.amt)}</div>
+    </div>`;
+  }).join('');
+
+  const sheet = document.getElementById('modalSheet');
+  sheet.innerHTML = `
+    <div class="sheet-icon" style="background:var(--primary-tint);color:var(--primary);"><i class="fa-solid fa-chart-pie"></i></div>
+    <h3>Today's Collection Breakdown</h3>
+    <p>How today's ${money(total)} collection was received, split by payment mode.</p>
+    <div class="cb-list">${rows}</div>
+    <div class="cb-total-row"><span class="cb-total-label">Total Collected</span><span class="cb-total-amt">${money(total)}</span></div>
+    <div class="sheet-actions" style="margin-top:18px;">
+      <button class="btn btn-primary btn-full" onclick="closeModal()">Close</button>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  stopQrScanner();
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e){ if(e.target === this) closeModal(); });
+
+/* ======================================================================
+   DAILY CHECK-IN — scan today's branch QR or type the number to go online.
+   Until this succeeds, navigateTo() bounces every view back to Home, which
+   shows the "Please Online Fast" gate.
+====================================================================== */
+function updateCheckinBadge(){
+  const btn = document.getElementById('checkinBtn');
+  if(!btn) return;
+  if(agentOnline){
+    btn.classList.add('online');
+    btn.innerHTML = '<i class="fa-solid fa-circle"></i><span>Online</span>';
+    btn.title = 'You are checked in for today';
+  } else {
+    btn.classList.remove('online');
+    btn.innerHTML = '<i class="fa-solid fa-qrcode"></i>';
+    btn.title = 'Check-in required';
+  }
+}
+
+let _html5QrLoading = null;
+function loadHtml5QrLib(){
+  if(window.Html5Qrcode) return Promise.resolve();
+  if(_html5QrLoading) return _html5QrLoading;
+  _html5QrLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Could not load the QR scanner.'));
+    document.head.appendChild(s);
+  });
+  return _html5QrLoading;
+}
+
+let _qrScanner = null;
+let _qrScannerRunning = false;
+
+function openCheckinModal(){
+  const sheet = document.getElementById('modalSheet');
+  sheet.innerHTML = `
+    <div class="sheet-icon"><i class="fa-solid fa-qrcode"></i></div>
+    <h3>Daily Check-in</h3>
+    <p>Scan today's QR code from your branch manager, or type the number they give you, to go online.</p>
+    <div class="checkin-scan-tabs">
+      <button id="ciTabScan" class="active" onclick="switchCheckinTab('scan')"><i class="fa-solid fa-camera"></i> Scan QR</button>
+      <button id="ciTabManual" onclick="switchCheckinTab('manual')"><i class="fa-solid fa-keyboard"></i> Enter Number</button>
+    </div>
+    <div id="ciScanPane">
+      <div id="ciReader"></div>
+      <div id="ciScanStatus" style="text-align:center;font-size:13px;color:var(--text-soft);margin-top:10px;">Starting camera…</div>
+    </div>
+    <div id="ciManualPane" class="hidden">
+      <div class="field" style="margin-top:14px;">
+        <label>Check-in Number</label>
+        <div class="input-wrap"><i class="fa-solid fa-hashtag"></i>
+          <input id="ciCodeInput" inputmode="numeric" maxlength="10" placeholder="e.g. 048213" style="letter-spacing:3px;font-weight:700;">
+        </div>
+      </div>
+      <div id="ciManualError" style="color:var(--danger);font-size:13px;display:none;margin-bottom:6px;"></div>
+      <button class="btn btn-primary btn-full" id="ciManualSubmit" onclick="submitManualCheckinCode()">Go Online</button>
+    </div>
+    <div class="sheet-actions" style="margin-top:16px;">
+      <button class="btn btn-outline btn-full" onclick="closeModal()">Cancel</button>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+  startQrScanner();
+}
+
+function switchCheckinTab(which){
+  const scanTab = document.getElementById('ciTabScan');
+  const manualTab = document.getElementById('ciTabManual');
+  const scanPane = document.getElementById('ciScanPane');
+  const manualPane = document.getElementById('ciManualPane');
+  if(which === 'scan'){
+    scanTab.classList.add('active'); manualTab.classList.remove('active');
+    scanPane.classList.remove('hidden'); manualPane.classList.add('hidden');
+    startQrScanner();
+  } else {
+    manualTab.classList.add('active'); scanTab.classList.remove('active');
+    manualPane.classList.remove('hidden'); scanPane.classList.add('hidden');
+    stopQrScanner();
+    setTimeout(()=>{ const el = document.getElementById('ciCodeInput'); if(el) el.focus(); }, 50);
+  }
+}
+
+async function startQrScanner(){
+  const statusEl = document.getElementById('ciScanStatus');
+  try{
+    await loadHtml5QrLib();
+    if(!document.getElementById('ciReader')) return; // modal closed/tab switched meanwhile
+    if(_qrScannerRunning) return;
+    _qrScanner = new Html5Qrcode('ciReader');
+    await _qrScanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 220, height: 220 } },
+      (decodedText) => { onCheckinQrScanned(decodedText); },
+      () => { /* per-frame no-match — ignore, keep scanning */ }
+    );
+    _qrScannerRunning = true;
+    if(statusEl) statusEl.textContent = 'Point your camera at the QR code';
+  }catch(e){
+    if(statusEl) statusEl.textContent = (e && e.message) ? e.message : 'Camera unavailable — use "Enter Number" instead.';
+  }
+}
+function stopQrScanner(){
+  const s = _qrScanner;
+  if(s && _qrScannerRunning){
+    _qrScannerRunning = false;
+    s.stop().then(()=> s.clear()).catch(()=>{});
+  }
+  _qrScanner = null;
+}
+function onCheckinQrScanned(decodedText){
+  if(!_qrScannerRunning) return; // avoid double-fire while stopping
+  stopQrScanner();
+  const statusEl = document.getElementById('ciScanStatus');
+  if(statusEl) statusEl.textContent = 'Checking…';
+  submitCheckinCode(decodedText, (msg) => {
+    if(statusEl) statusEl.textContent = msg;
+    setTimeout(()=> startQrScanner(), 1200);
+  });
+}
+function submitManualCheckinCode(){
+  const input = document.getElementById('ciCodeInput');
+  const errEl = document.getElementById('ciManualError');
+  const btn = document.getElementById('ciManualSubmit');
+  const code = (input.value || '').trim();
+  errEl.style.display = 'none';
+  if(!code){ errEl.textContent = 'Enter the number your branch manager gave you.'; errEl.style.display = 'block'; return; }
+  if(btn) btn.disabled = true;
+  submitCheckinCode(code, (msg) => {
+    errEl.textContent = msg; errEl.style.display = 'block';
+  }, () => { if(btn) btn.disabled = false; });
+}
+async function submitCheckinCode(code, onError, onDone){
+  try{
+    const res = await apiPost('checkin.php', { code });
+    agentOnline = true;
+    updateCheckinBadge();
+    closeModal();
+    showToast('You are online for today!', 'success');
+    if(nav.current === 'home') loadDashboard();
+  }catch(e){
+    if(onError) onError(e.message || 'Invalid or expired code.');
+  }finally{
+    if(onDone) onDone();
+  }
+}
+async function checkOnlineStatusNow(){
+  const token = SF.read('agentToken');
+  if(!token || !state || !state.session) return;
+  try{
+    const res = await apiGet('checkin.php?forAgent=1');
+    const was = agentOnline;
+    agentOnline = !!res.online;
+    if(was !== agentOnline){
+      updateCheckinBadge();
+      if(nav.current === 'home') loadDashboard();
+      else if(!agentOnline) navigateTo('home');
+    }
+  }catch(e){ /* silent — next tick retries */ }
+}
+
+/* ---------------------------- INIT ---------------------------- */
+/* ======================================================================
+   REAL-TIME AUTO UPDATE SYSTEM (Agent Panel)
+   - Full data refresh every 30 seconds
+   - Notification-only poll every 15 seconds
+   - Pauses when tab hidden; resumes on focus
+   - Live indicator shows sync status
+====================================================================== */
+/* ======================================================================
+   LT — LIVE LOCATION TRACKER  (Service Worker backed)
+   -------------------------------------------------------
+   দুটো layer এ কাজ করে:
+
+   Layer 1 — In-page fallback (পুরানো পদ্ধতি):
+     App খোলা থাকলে সরাসরি navigator.geolocation → location.php, 30s পর পর।
+
+   Layer 2 — Service Worker (background):
+     App minimize / screen off / অন্য app এ গেলেও SW চলে।
+     SW নিজে GPS নিতে পারে না (browser limit), তাই SW → page কে
+     'SW_REQUEST_LOCATION' message পাঠায় → page GPS নিয়ে SW কে দেয়
+     → SW সেটা server এ পাঠায়।
+     যখন কোনো tab খোলা নেই, SW একটা silent notification দেখায়
+     (Android এ SW alive রাখার standard কৌশল)।
+
+   App সম্পূর্ণ kill (force stop) করলে SW ও বন্ধ হয় —
+   এটা Android/iOS OS-level hard limit, কোনো web app এটা bypass
+   করতে পারে না।
+====================================================================== */
+const LT = (function(){
+  const SEND_INTERVAL = 30 * 1000;
+  let timer    = null;
+  let running  = false;
+  let deniedWarned = false;
+  let swReg    = null;
+  let swReady  = false;
+
+  /* ── Helpers ── */
+  function getToken()  { return SF.read('agentToken'); }
+  function getAgentId(){ return state && state.session ? state.session.agentId || state.session.id : null; }
+  function getApiBase(){
+    if(window.Capacitor && window.Capacitor.isNativePlatform()){
+      return 'https://bmchome.in/backend/api';
+    }
+    const url = new URL(location.href);
+    return url.origin + url.pathname.replace(/\/[^/]*$/, '') + '/backend/api';
+  }
+
+  /* ══════════════════════════════════════════
+     Layer 0 — Capacitor Background Geolocation
+     Native APK এ app বন্ধ থাকলেও GPS পাঠাবে
+     ══════════════════════════════════════════ */
+  let bgGeoReady = false;
+
+  async function startCapacitorBG(){
+    if(!window.Capacitor || !window.Capacitor.isNativePlatform()) return false;
+    try {
+      const { BackgroundGeolocation } = window;
+      if(!BackgroundGeolocation) return false;
+
+      await BackgroundGeolocation.ready({
+        desiredAccuracy:    BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
+        distanceFilter:     10,
+        stopOnTerminate:    false,
+        startOnBoot:        true,
+        enableHeadless:     true,
+        notification: {
+          title: 'Swanirbhar Sansar',
+          text:  'Location tracking চলছে',
+          smallIcon: 'mipmap/ic_launcher',
+        },
+        url:          getApiBase() + '/location.php',
+        method:       'POST',
+        autoSync:     true,
+        autoSyncThreshold: 0,
+        batchSync:    false,
+        headers:      { 'Authorization': 'Bearer ' + getToken() },
+        locationTemplate: '{ "latitude":<%= latitude %>, "longitude":<%= longitude %>, "accuracy":<%= accuracy %> }',
+        httpRootProperty: '.',
+        logLevel:     BackgroundGeolocation.LOG_LEVEL_OFF,
+      });
+
+      await BackgroundGeolocation.setConfig({
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      });
+
+      await BackgroundGeolocation.start();
+      bgGeoReady = true;
+      console.log('[LT] Capacitor BackgroundGeolocation started');
+      return true;
+    } catch(e){
+      console.warn('[LT] Capacitor BG Geo failed:', e);
+      return false;
+    }
+  }
+
+  async function stopCapacitorBG(){
+    if(!bgGeoReady) return;
+    try {
+      const { BackgroundGeolocation } = window;
+      if(BackgroundGeolocation) await BackgroundGeolocation.stop();
+      bgGeoReady = false;
+    } catch(e){}
+  }
+
+  /* ══════════════════════════════════════════
+     Layer 1 — In-page GPS (browser fallback)
+     ══════════════════════════════════════════ */
+  function sendPosition(pos){
+    const token = getToken();
+    if(!token || !state || !state.session) return;
+    apiPost('location.php', {
+      latitude:  pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      accuracy:  pos.coords.accuracy
+    }).catch(()=>{});
+  }
+
+  function handleError(err){
+    if(err && err.code === 1 && !deniedWarned){
+      deniedWarned = true;
+      showToast('Location permission off — admin can\'t see your live location', 'error');
+    }
+  }
+
+  function captureAndSend(){
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(sendPosition, handleError, {
+      enableHighAccuracy: true, timeout: 15000, maximumAge: 20000
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     Layer 2 — Service Worker (browser background)
+     ══════════════════════════════════════════ */
+  async function registerSW(){
+    if(!('serviceWorker' in navigator)) return;
+    try{
+      swReg = await navigator.serviceWorker.register('location-sw.js', { scope: './' });
+      swReady = true;
+      navigator.serviceWorker.addEventListener('message', onSwMessage);
+    }catch(e){
+      console.warn('[LT] SW registration failed:', e);
+    }
+  }
+
+  function onSwMessage(e){
+    const { type } = e.data || {};
+    if(type === 'SW_REQUEST_LOCATION'){
+      if(!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(pos => {
+        if(swReg && swReg.active){
+          swReg.active.postMessage({
+            type:      'LOCATION_RESPONSE',
+            latitude:  pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy:  pos.coords.accuracy,
+            token:     getToken(),
+          });
+        }
+      }, ()=>{}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 20000 });
+    }
+  }
+
+  function tellSwStart(){
+    if(!swReg || !swReg.active) return;
+    swReg.active.postMessage({
+      type:    'START_TRACKING',
+      token:   getToken(),
+      agentId: getAgentId(),
+      base:    getApiBase(),
+    });
+  }
+
+  function tellSwStop(){
+    if(!swReg || !swReg.active) return;
+    swReg.active.postMessage({ type: 'STOP_TRACKING' });
+  }
+
+  /* ══════════════════════════════════════════
+     Public API
+     ══════════════════════════════════════════ */
+  async function start(){
+    if(running) return;
+    running = true;
+
+    const nativeStarted = await startCapacitorBG();
+
+    if(!nativeStarted){
+      captureAndSend();
+      timer = setInterval(captureAndSend, SEND_INTERVAL);
+      if(!swReady) await registerSW();
+      await new Promise(r => setTimeout(r, 500));
+      tellSwStart();
+      if('Notification' in window && Notification.permission === 'default'){
+        Notification.requestPermission();
+      }
+    }
+  }
+
+  function stop(){
+    running = false;
+    clearInterval(timer); timer = null;
+    stopCapacitorBG();
+    tellSwStop();
+  }
+
+  function stopInPage(){
+    running = false;
+    clearInterval(timer); timer = null;
+    // native BG ও SW চলতে থাকে
+  }
+
+  if('serviceWorker' in navigator) registerSW();
+
+  return { start, stop, stopInPage };
+})();
+
+const RT = (function(){
+  // BUGFIX: these were hardcoded to 5s each — with two separate timers
+  // (notif poll + full refresh) both hitting sync.php roughly every 5s,
+  // that's a server call every ~2.5s per agent, far more aggressive than
+  // this file's own comments (and the README) describe ("every 15-30s").
+  // On a weak/patchy field network, a single request can take close to
+  // the 12s abort timeout below — the next 5s tick fired anyway, stacking
+  // overlapping requests that congested the connection further and kept
+  // showing the "Retry…" indicator. Restored to the intended cadence, and
+  // isSyncing guards (below) stop a new poll from starting while the
+  // previous one is still in flight.
+  const FULL_INTERVAL   = 30 * 1000;  // 30s — full data refresh (background, always on)
+  const NOTIF_INTERVAL  = 15 * 1000;  // 15s — notification poll
+  const STATUS_INTERVAL = 60 * 1000;  // 60s — catches midnight check-in rollover
+  const SHOW_LIVE_MS    = 2200;
+
+  let fullTimer    = null;
+  let notifTimer   = null;
+  let statusTimer  = null;
+  let liveHideTimer= null;
+  let running      = false;
+  // BUGFIX: in-flight guards — without these, a slow request (network lag,
+  // or the server's 503 "busy, try again" from a lock) left the PREVIOUS
+  // poll still pending when the next setInterval tick fired a new one on
+  // top of it, compounding congestion on slow connections instead of just
+  // waiting for the next clean tick.
+  let notifInFlight = false;
+  let fullInFlight  = false;
+  let lastNotifSync = Date.now();
+  let lastFullSync  = Date.now();
+
+  /* ── Live Indicator ── */
+  function showLive(text, cls){
+    const el = document.getElementById('liveIndicator');
+    const tx = document.getElementById('liveText');
+    if(!el) return;
+    el.classList.remove('syncing','error');
+    if(cls) el.classList.add(cls);
+    if(tx) tx.textContent = text;
+    el.classList.add('visible');
+    clearTimeout(liveHideTimer);
+    liveHideTimer = setTimeout(()=> el.classList.remove('visible'), SHOW_LIVE_MS);
+  }
+
+  /* ── Sync notification badge ── */
+  function syncNotifBadge(){
+    if(!state || !state.notifications) return;
+    const agent   = currentAgent();
+    if(!agent) return;
+    const unread  = state.notifications.filter(n => n.agentId === agent.id && !n.read).length;
+    const dot     = document.getElementById('notifDot');
+    if(!dot) return;
+    if(unread > 0){ dot.textContent = unread > 99 ? '99+' : unread; dot.classList.remove('hidden'); }
+    else           { dot.classList.add('hidden'); }
+  }
+
+  /* ── Merge sync delta into agent state ── */
+  function mergeSync(delta){
+    if(!delta) return { payments:false, loans:false, emis:false, notifications:false, groups:false, members:false };
+    const changed = { payments:false, loans:false, emis:false, notifications:false, groups:false, members:false };
+    const agent = currentAgent();
+
+    /* Deletions from other users: drop any id that's been hard-deleted
+       server-side (e.g. admin deleted a member/group/loan) — otherwise it
+       keeps showing here until a full page reload. Done first so the
+       group re-enrichment below (which recomputes each group's member id
+       list) sees the already-cleaned member list. */
+    function removeIds(key, ids, changedKey){
+      if(ids && ids.length && state[key] && state[key].length){
+        const idSet = new Set(ids.map(String));
+        const before = state[key].length;
+        state[key] = state[key].filter(r=>!idSet.has(String(r.id)));
+        if(state[key].length !== before) changed[changedKey] = true;
+      }
+    }
+    removeIds('members', delta.deletedMembers, 'members');
+    removeIds('groups', delta.deletedGroups, 'groups');
+    removeIds('loans', delta.deletedLoans, 'loans');
+    removeIds('emis', delta.deletedEmis, 'emis');
+    removeIds('payments', delta.deletedPayments, 'payments');
+
+    /* Members: upsert (e.g. admin added/edited a member in one of my groups).
+       Enriched the same way initData() does, or fields like memberCode/
+       joinDate that renderers expect would be missing on synced-in rows. */
+    if(delta.members && delta.members.length){
+      changed.members = true;
+      state.members = state.members || [];
+      /* Deduplicate existing members first */
+      const seenMemberIds = new Set();
+      state.members = state.members.filter(m => {
+        if(seenMemberIds.has(String(m.id))) return false;
+        seenMemberIds.add(String(m.id));
+        return true;
+      });
+      /* Now merge with delta using index */
+      const idx = {}; state.members.forEach((m,i)=>idx[m.id]=i);
+      const enriched = SF.enrichMembersForAgent(delta.members);
+      enriched.forEach(m=>{
+        if(idx[m.id]!==undefined) state.members[idx[m.id]] = m;
+        else state.members.push(m);
+      });
+    }
+    /* Groups: upsert (e.g. admin renamed a group, or reassigned it).
+       Re-enriched against the now-current full member list so `members`
+       (the id list on each group) stays correct even after the member
+       merge above. */
+    if(delta.groups && delta.groups.length){
+      changed.groups = true;
+      state.groups = state.groups || [];
+      /* Deduplicate existing groups first */
+      const seenGroupIds = new Set();
+      state.groups = state.groups.filter(g => {
+        if(seenGroupIds.has(String(g.id))) return false;
+        seenGroupIds.add(String(g.id));
+        return true;
+      });
+      /* Now merge with delta using index */
+      const idx = {}; state.groups.forEach((g,i)=>idx[g.id]=i);
+      const enriched = SF.enrichGroupsForAgent(delta.groups, state.members || []);
+      enriched.forEach(g=>{
+        if(idx[g.id]!==undefined) state.groups[idx[g.id]] = g;
+        else state.groups.push(g);
+      });
+    }
+    /* Payments: upsert */
+    if(delta.payments && delta.payments.length){
+      changed.payments = true;
+      state.payments = state.payments || [];
+      /* Deduplicate existing payments first */
+      const seenPaymentIds = new Set();
+      state.payments = state.payments.filter(p => {
+        if(seenPaymentIds.has(String(p.id))) return false;
+        seenPaymentIds.add(String(p.id));
+        return true;
+      });
+      /* Now merge with delta using index */
+      const idx = {}; state.payments.forEach((p,i)=>idx[p.id]=i);
+      const enriched = SF.enrichPaymentsForAgent(delta.payments, state.emis || []);
+      enriched.forEach(p=>{
+        if(idx[p.id]!==undefined) state.payments[idx[p.id]] = p;
+        else state.payments.unshift(p);
+      });
+    }
+    /* EMIs: upsert (done BEFORE loans — an admin editing a loan's schedule
+       [date/frequency/EMI count] regenerates its unpaid EMI rows, and
+       enrichLoansForAgent() below derives the loan's nextDueDate/remainingEmi
+       from state.emis. If loans were merged first, that derivation would run
+       against the still-stale pre-edit EMI rows, freezing the Agent Panel's
+       "Next Due Date" on the old date even though the EMI list itself was
+       correct — merging EMIs first makes sure the loan sees this same poll's
+       fresh due dates. */
+    if(delta.emis && delta.emis.length){
+      changed.emis = true;
+      state.emis = state.emis || [];
+      /* Deduplicate existing EMIs first */
+      const seenEmiIds = new Set();
+      state.emis = state.emis.filter(e => {
+        if(seenEmiIds.has(String(e.id))) return false;
+        seenEmiIds.add(String(e.id));
+        return true;
+      });
+      /* Now merge with delta using index */
+      const idx = {}; state.emis.forEach((e,i)=>idx[e.id]=i);
+      const enriched = SF.enrichEmisForAgent(delta.emis, state.payments || []);
+      enriched.forEach(e=>{
+        if(idx[e.id]!==undefined) state.emis[idx[e.id]] = e;
+        else state.emis.push(e);
+      });
+    }
+    /* Loans: upsert */
+    if(delta.loans && delta.loans.length){
+      changed.loans = true;
+      state.loans = state.loans || [];
+      /* Deduplicate existing loans first */
+      const seenLoanIds = new Set();
+      state.loans = state.loans.filter(l => {
+        if(seenLoanIds.has(String(l.id))) return false;
+        seenLoanIds.add(String(l.id));
+        return true;
+      });
+      /* Now merge with delta using index */
+      const idx = {}; state.loans.forEach((l,i)=>idx[l.id]=i);
+      const enriched = SF.enrichLoansForAgent(delta.loans, state.emis || [], state.payments || []);
+      enriched.forEach(l=>{
+        if(idx[l.id]!==undefined) state.loans[idx[l.id]] = l;
+        else state.loans.unshift(l);
+      });
+    }
+    /* Notifications: upsert */
+    if(delta.notifications && delta.notifications.length){
+      changed.notifications = true;
+      state.notifications = state.notifications || [];
+      const prevUnread = agent ? state.notifications.filter(n=>n.agentId===agent.id&&!n.read).length : 0;
+      /* Deduplicate existing notifications first */
+      const seenNotifIds = new Set();
+      state.notifications = state.notifications.filter(n => {
+        if(seenNotifIds.has(String(n.id))) return false;
+        seenNotifIds.add(String(n.id));
+        return true;
+      });
+      /* Now merge with delta using index */
+      const idx = {}; state.notifications.forEach((n,i)=>idx[n.id]=i);
+      delta.notifications.forEach(raw=>{
+        const n = { id:String(raw.id), agentId:agent?agent.id:null,
+                    title:raw.title, message:raw.message, type:raw.type,
+                    read:!!raw.is_read, date:raw.created_at };
+        if(idx[n.id]!==undefined) state.notifications[idx[n.id]] = n;
+        else state.notifications.unshift(n);
+      });
+      syncNotifBadge();
+      const currUnread = agent ? state.notifications.filter(n=>n.agentId===agent.id&&!n.read).length : 0;
+      if(currUnread > prevUnread) showLive('নতুন notification!', 'syncing');
+    }
+    return changed;
+  }
+
+  /* ── Lightweight: poll only recent changes ── */
+  async function pollNotifications(){
+    const token = SF.read('agentToken');
+    if(!token || !state || !state.session) return;
+    if(notifInFlight) return; // previous poll still running — skip this tick
+    notifInFlight = true;
+    // BUGFIX: only commit the watermark after a successful response — see
+    // matching note in refreshAll() below. Advancing it before the request
+    // resolved meant a failed/timed-out poll silently skipped whatever
+    // changed during it, until a full page reload.
+    const attemptStart = Date.now();
+    try{
+      const since = new Date(lastNotifSync - 5000).toISOString();
+      const delta = await apiGet('sync.php?since=' + encodeURIComponent(since));
+      lastNotifSync = attemptStart;
+      const changed = mergeSync(delta);
+      if(Object.values(changed).some(Boolean)) cacheAgentState();
+      if(nav && nav.current === 'notifications') loadNotifications();
+    }catch(e){ /* silent */ }
+    finally{ notifInFlight = false; }
+  }
+
+  /* ── Full data refresh every 30s via sync.php ── */
+  async function refreshAll(){
+    const token = SF.read('agentToken');
+    if(!token || !state || !state.session) return;
+    if(fullInFlight) return; // previous refresh still running — skip this tick
+    fullInFlight = true;
+    showLive('Syncing…', 'syncing');
+    // BUGFIX: same as pollNotifications() above — only commit the watermark
+    // once the request actually succeeds, so a failed/timed-out poll can't
+    // silently skip the changes that happened during it.
+    const attemptStart = Date.now();
+    try{
+      const since = new Date(lastFullSync - 5000).toISOString();
+      const delta = await apiGet('sync.php?since=' + encodeURIComponent(since));
+      lastFullSync = attemptStart;
+      const changed = mergeSync(delta);
+      if(Object.values(changed).some(Boolean)) cacheAgentState();
+      /* Render only if something changed in the current view */
+      const viewsForPayments = ['home','collection','due','emi'];
+      const viewsForLoans    = ['home','memberDetail','groupDetail'];
+      const viewsForEmis     = ['home','emi','due','overdue'];
+      const viewsForGroups   = ['home','groups','groupDetail'];
+      const viewsForMembers  = ['home','groups','groupDetail','memberDetail'];
+      const shouldRender =
+        (changed.payments && viewsForPayments.includes(nav.current)) ||
+        (changed.loans    && viewsForLoans.includes(nav.current))    ||
+        (changed.emis     && viewsForEmis.includes(nav.current))     ||
+        (changed.groups   && viewsForGroups.includes(nav.current))   ||
+        (changed.members  && viewsForMembers.includes(nav.current))  ||
+        (changed.notifications && nav.current === 'notifications');
+      if(shouldRender) renderCurrentView();
+      showLive('Live ✓', null);
+    }catch(e){
+      showLive('Retry: ' + (e && e.message ? e.message.slice(0,80) : 'unknown'), 'error');
+    }
+    finally{ fullInFlight = false; }
+  }
+
+  function start(){
+    if(running) return;
+    running     = true;
+    notifTimer  = setInterval(pollNotifications, NOTIF_INTERVAL);
+    fullTimer   = setInterval(refreshAll,        FULL_INTERVAL);
+    statusTimer = setInterval(checkOnlineStatusNow, STATUS_INTERVAL);
+  }
+
+  function stop(){
+    clearInterval(notifTimer);  notifTimer  = null;
+    clearInterval(fullTimer);   fullTimer   = null;
+    clearInterval(statusTimer); statusTimer = null;
+    running = false;
+  }
+
+  document.addEventListener('visibilitychange', ()=>{
+    if(!state || !state.session) return;
+    if(document.hidden){
+      stop();
+    } else {
+      start();
+      // refreshAll এর error কে silently catch করো — network hiccup এর
+      // কারণে agent কে logout করা উচিত না, পরের 30s poll এ retry হবে
+      refreshAll().catch(()=>{});
+    }
+  });
+
+  return { start, stop, syncNotifBadge, refreshAll };
+})();
+
+/* Helper: re-render whichever Agent view is active */
+function renderCurrentView(){
+  if(!nav || !nav.current) return;
+  const v = nav.current;
+  if(v==='home')              loadDashboard();
+  else if(v==='groups')       loadAssignedGroups();
+  else if(v==='groupDetail')  loadGroupMembers(nav.params && nav.params.groupId);
+  else if(v==='memberDetail') loadMemberDetails(nav.params && nav.params.memberId);
+  else if(v==='emi')          loadEMI((nav.params && nav.params.tab) || uiTemp.emiTab || 'today');
+  else if(v==='collection')   loadCollectionHistory();
+  else if(v==='due')          loadDueList((nav.params && nav.params.filter) || uiTemp.dueTab || 'today');
+  else if(v==='overdue')      loadOverdueList();
+  else if(v==='notifications') loadNotifications();
+}
+
+async function boot(){
+  const session = SF.read('agentSession');
+  const token = SF.read('agentToken');
+  if(session && token){
+    /* Instant paint: if we have a snapshot from the last live update, show
+       that immediately instead of a blank shell — this is what a refresh
+       should show first, not whatever was last true at login. A real fetch
+       always follows right behind it, so this is only ever a first paint. */
+    const cached = readCachedAgentState();
+    if(cached){
+      state = cached.state;
+      state.session = session;
+      agentOnline = !!cached.agentOnline;
+      updateCheckinBadge();
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+      navigateTo('home');
+      RT.start();
+      RT.syncNotifBadge();
+      LT.start();
+    }
+    try{
+      await initData();
+      state.session = session;
+      if(cached){
+        /* Already showing the cached view above — just refresh with the
+           now-current data. */
+        navigateTo(nav.current || 'home');
+        RT.syncNotifBadge();
+      }else{
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appShell').classList.remove('hidden');
+        navigateTo('home');
+        RT.start();
+        RT.syncNotifBadge();
+        LT.start();
+      }
+      return;
+    }catch(e){
+      // 401 হলে apiFetch() নিজেই logoutAgent() call করে — এখানে আর কিছু করার নেই
+      if(sessionForceLoggingOut) return;
+
+      if(cached){
+        // Cached data আছে — agent কে app এ রাখো, RT পরে retry করবে
+        return;
+      }
+
+      // Cached নেই, কিন্তু 401 নয় — মানে network problem বা server hiccup।
+      // Token/session এখনো valid হতে পারে — তাই logout করব না।
+      // App shell দেখিয়ে রাখো, একটা retry banner দেখাও।
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+      navigateTo('home');
+      // Retry banner — agent নিজে refresh করতে পারবে
+      showToast('Network error — retrying…', 'error');
+      // 10s পরে নিজে থেকে একবার retry করো
+      setTimeout(async () => {
+        if(!state || !state.session) return;
+        try{
+          await initData();
+          state.session = SF.read('agentSession');
+          navigateTo(nav.current || 'home');
+          RT.start(); RT.syncNotifBadge(); LT.start();
+        }catch(_){ /* still failing — RT will keep retrying every 30s */ }
+      }, 10000);
+    }
+  }
+}
+
+/* Patch loginAgent to start RT after login */
+const _origLoginAgent = loginAgent;
+loginAgent = async function(agentId, password){
+  await _origLoginAgent(agentId, password);
+  /* If login succeeded, session will be set */
+  if(state && state.session){ RT.start(); RT.syncNotifBadge(); LT.start(); }
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   logoutAgent patch:
+   - RT (real-time sync) বন্ধ হবে — server poll দরকার নেই।
+   - LT (location tracker) in-page part বন্ধ হবে।
+   - কিন্তু SW (Service Worker) বন্ধ হবে না — background tracking
+     চলতে থাকবে। Agent app বন্ধ করলেও SW জীবিত থাকে।
+   - SW কে STOP করতে হলে শুধু admin panel থেকে করা যাবে
+     (ADMIN_STOP_TRACKING message), অথবা agent নিজে app খুলে
+     "Stop Tracking" বোতাম চাপলে।
+   ══════════════════════════════════════════════════════════════════ */
+const _origLogoutAgent = logoutAgent;
+logoutAgent = function(){
+  RT.stop();
+  LT.stopInPage(); // শুধু in-page interval বন্ধ করে, SW চলতে থাকে
+  _origLogoutAgent();
+};
+
+boot();
+
+/* ── Visibility API: app এ ফিরলে SW এর status check করো ── */
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible'){
+    if(navigator.serviceWorker && navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage({ type: 'GET_STATUS' });
+    }
+  }
+});
+
+/* ── SW status reply handler ── */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message', e => {
+    const data = e.data || {};
+    if(data.type === 'SW_STATUS'){
+      if(data.tracking){
+        // SW background এ tracking করছিল — in-page part ও চালু করো
+        LT.start();
+      } else if(data.reason === 'revoked'){
+        // Admin session revoke করেছে — agent কে জানাও
+        showToast('আপনার session admin বন্ধ করেছেন। পুনরায় লগইন করুন।', 'error');
+        // Already logged out state — শুধু UI reset করো যদি দরকার হয়
+        if(state && state.session){ logoutAgent(); }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

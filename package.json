@@ -1,0 +1,18 @@
+{
+  "name": "swanirbhar-sansar-agent",
+  "version": "1.0.0",
+  "description": "Swanirbhar Sansar Agent App",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx cap copy android && npx cap sync android",
+    "open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor-community/background-geolocation": "^1.2.7"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
