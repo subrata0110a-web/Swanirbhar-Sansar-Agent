@@ -1,7 +1,7 @@
 {
   "appId": "com.swanirbharsansar.agent",
   "appName": "Swanirbhar Sansar Agent",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "url": "https://bmchome.in/Agent.html",
     "cleartext": false
